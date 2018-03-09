@@ -1,0 +1,6 @@
+pictureframe 367 130 419 172
+pottedplant 329 2 441 212
+tvmonitor 460 19 638 284
+tvmonitor 119 50 204 80
+coffeetable 288 217 589 466
+candle 422 227 454 284

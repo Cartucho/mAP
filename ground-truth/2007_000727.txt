@@ -1,0 +1,9 @@
+cabinetry 89 11 390 171
+door 400 7 493 97
+doorhandle 401 50 491 89
+chair 358 104 638 476
+diningtable 319 97 375 193
+countertop 12 80 170 286
+tap 40 61 75 88
+wastecontainer 3 230 64 314
+bottle 362 64 381 118

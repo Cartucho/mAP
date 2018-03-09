@@ -1,0 +1,6 @@
+door 416 7 597 233
+doorhandle 421 52 587 106
+chair 202 166 361 409
+chair 18 408 489 477
+diningtable 7 192 518 459
+cup 28 183 94 263

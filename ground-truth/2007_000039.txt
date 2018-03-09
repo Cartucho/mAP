@@ -1,0 +1,3 @@
+wastecontainer 528 213 602 300
+nightstand 47 115 84 199
+lamp 12 53 29 85

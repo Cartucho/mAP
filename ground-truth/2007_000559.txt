@@ -1,0 +1,2 @@
+chair 576 93 635 419
+diningtable 2 141 82 317

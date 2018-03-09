@@ -1,0 +1,10 @@
+pictureframe 191 113 238 142
+pillow 223 185 369 225
+pottedplant 135 37 214 184
+chair 424 114 636 477
+tvmonitor 313 46 482 145
+sofa 5 150 453 450
+vase 155 149 197 184
+coffeetable 289 151 443 205
+coffeetable 177 134 279 193
+candle 381 138 399 171

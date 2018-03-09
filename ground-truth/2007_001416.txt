@@ -1,0 +1,12 @@
+cabinetry 3 2 269 227
+cabinetry 435 10 631 164
+door 286 5 383 125
+doorhandle 287 50 381 90
+chair 172 137 297 328
+chair 342 152 457 336
+chair 260 116 354 271
+chair 584 86 638 240
+diningtable 234 116 453 324
+diningtable 485 104 627 272
+cup 256 113 287 149
+envelope 568 96 612 122

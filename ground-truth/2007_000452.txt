@@ -1,0 +1,8 @@
+bed 3 91 603 479
+pictureframe 249 126 286 153
+lamp 225 54 250 146
+nightstand 200 141 302 185
+heater 147 130 237 179
+windowblind 5 2 152 77
+pillow 312 86 420 170
+pillow 433 112 589 202

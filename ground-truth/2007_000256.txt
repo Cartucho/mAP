@@ -1,0 +1,5 @@
+sink 398 139 640 223
+wastecontainer 182 390 335 481
+tap 569 51 634 179
+countertop 319 97 635 481
+person 108 34 144 65

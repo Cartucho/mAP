@@ -1,0 +1,8 @@
+cabinetry 374 4 635 160
+shelf 247 3 334 57
+chair 544 116 636 262
+countertop 249 92 415 281
+tap 302 66 339 96
+wastecontainer 245 226 309 305
+bottle 366 49 394 95
+tincan 356 56 380 101

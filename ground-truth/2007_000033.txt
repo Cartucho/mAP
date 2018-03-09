@@ -1,0 +1,6 @@
+pottedplant 4 13 79 154
+tvmonitor 93 37 194 121
+shelf 277 2 444 101
+windowblind 469 4 552 91
+coffetable_error 11 152 84 250
+door 516 5 638 410

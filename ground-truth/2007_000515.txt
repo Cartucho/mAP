@@ -1,0 +1,13 @@
+bed 2 94 441 457
+person 471 46 525 88
+pictureframe 489 140 529 167
+pictureframe 159 125 186 146
+shirt 529 148 568 173
+lamp 496 71 522 140
+lamp 128 61 158 145
+nightstand 469 157 565 284
+nightstand 116 138 205 179
+heater 58 125 153 164
+windowblind 2 1 60 82
+pillow 213 90 299 157
+pillow 316 111 426 173

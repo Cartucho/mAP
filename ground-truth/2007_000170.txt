@@ -1,0 +1,10 @@
+bowl 13 161 106 198
+chair 314 61 410 286
+diningtable 1 125 190 294
+diningtable 301 90 510 302
+chair 1 155 189 479
+door 20 1 189 196
+doorhandle 35 48 181 107
+doll 89 147 112 176
+envelope 377 119 432 138
+cabinetry 237 4 471 188

@@ -1,0 +1,9 @@
+bed 2 73 99 199
+person 200 43 237 70
+pictureframe 7 85 28 103
+pillow 39 67 101 106
+cup 531 87 580 122
+countertop 390 98 629 335
+tap 475 69 525 110
+wastecontainer 307 218 376 296
+sink 425 85 607 131

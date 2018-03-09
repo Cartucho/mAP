@@ -1,0 +1,8 @@
+pictureframe 206 248 278 335
+lamp 426 298 499 425
+heater 205 173 424 296
+pottedplant 330 231 396 330
+tvmonitor 2 10 205 293
+glasses 276 361 347 397
+vase 335 281 376 329
+coffeetable 205 305 563 476

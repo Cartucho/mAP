@@ -1,0 +1,14 @@
+pottedplant 223 4 326 178
+pottedplant 345 130 370 160
+tvmonitor 429 43 640 211
+sofa 4 184 637 461
+remote 351 299 424 341
+pictureframe 279 114 339 161
+candle 481 157 515 204
+backpack 66 209 281 322
+tvmonitor 21 56 107 74
+vase 250 170 278 198
+lamp 341 3 377 90
+windowblind 304 7 432 73
+coffeetable 282 147 376 213
+coffeetable 386 175 611 304
