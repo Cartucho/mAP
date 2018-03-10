@@ -20,8 +20,8 @@ backpack
 whiteboard
 cup
 tvmonitor
-couch_error
-coffetable_error
+pen
+pencil
 wardrobe
 apple
 orange

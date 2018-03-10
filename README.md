@@ -16,5 +16,5 @@ First (**1.**), we calculate the Average Precision (AP), for each of the classes
 
 ##### Ground-truth
 
-A separate text file of ground-truth should be generated for each image. In these files, each line should be in the following format:
-<class_name> <left> <top> <right> <bottom>
+A separate text file of ground-truth objects should be generated for each image. In these files, each line should be in the following format:
+`<class_name> <left> <top> <right> <bottom>`
