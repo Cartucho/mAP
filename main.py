@@ -14,6 +14,7 @@ if not args.no_animation:
 
 if not args.no_plot:
   import matplotlib.pyplot as plt
+  import numpy as np
 
 MINOVERLAP = 0.5 # value defined in the PASCAL VOC2012 challenge
 
@@ -136,7 +137,10 @@ for class_name in unique_classes:
  Calculate the AP for each class
 """
 sum_AP = 0.0
-for class_name in unique_classes[1:]: # remove the [1:] !!!
+# create array of zeros to store all AP's
+n_classes = len(unique_classes)
+ap_array = [0] * n_classes
+for class_index, class_name in enumerate(unique_classes):
   """
    Load predictions of that class
   """
@@ -225,12 +229,13 @@ for class_name in unique_classes[1:]: # remove the [1:] !!!
   ap = voc_ap(rec, prec)
   sum_AP += ap
   print(class_name + " AP = %.4f" % ap)
+  ap_array[class_index] = ap
 
   if not args.no_plot:
     plt.plot(rec, prec, '-o')
     # set window title
     fig = plt.gcf() # gcf - get current figure
-    fig.canvas.set_window_title('AP - Average Precision')
+    fig.canvas.set_window_title('AP ' + class_name)
     # set plot title
     plt.title('class: ' + class_name + ", AP = %.4f" % ap)
     #plt.suptitle('This is a somewhat long figure title', fontsize=16)
@@ -242,11 +247,33 @@ for class_name in unique_classes[1:]: # remove the [1:] !!!
     axes.set_xlim([0.0,1.0])
     axes.set_ylim([0.0,1.05])
     # wait for button to be pressed
-    while not plt.waitforbuttonpress(): pass
+    #while not plt.waitforbuttonpress(): pass
     plt.cla() # clear axes for next plot
 
-mAP = sum_AP / len(unique_classes)
+mAP = sum_AP / n_classes
 print("mAP = " + str(mAP))
+
+if not args.no_plot:
+    # sort classes and AP by decreasing value
+    unique_classes = np.array(unique_classes)
+    ap_array = np.array(ap_array)
+    inds = ap_array.argsort()[::-1]
+    sorted_ap_array = ap_array[inds]
+    sorted_unique_classes = unique_classes[inds]
+    # draw histogram
+    plt.bar(np.arange(n_classes), sorted_ap_array, tick_label=sorted_unique_classes)
+    plt.xticks(xrange(n_classes), rotation='vertical')
+    # set window title
+    fig = plt.gcf() # gcf - get current figure
+    fig.canvas.set_window_title('mAP')
+    # set plot title
+    plt.title("mAP = %.4f" % mAP)
+    # set axis titles
+    #plt.xlabel('classes')
+    plt.ylabel('Average Precision')
+    # adjust size of window
+    fig.tight_layout()
+    plt.show()
 
 # remove the tmp_files directory
 shutil.rmtree(tmp_files_path)
