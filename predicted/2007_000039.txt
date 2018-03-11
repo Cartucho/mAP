@@ -1,2 +1,2 @@
-refrigerator;0.537946;482;0;638;275
-wastecontainer;0.313999;529;201;593;309
+refrigerator 0.537946 482 0 638 275
+wastecontainer 0.313999 529 201 593 309

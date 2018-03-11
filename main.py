@@ -1,6 +1,7 @@
 import argparse
 import glob
 import json
+import os
 
 MINOVERLAP = 0.5 # value defined in the PASCAL VOC2012 challenge
 
@@ -48,6 +49,15 @@ def voc_ap(rec, prec):
   return ap
 
 
+def file_lines_to_list(path):
+  # open txt file lines to a list
+  with open(path) as f:
+    content = f.readlines()
+  # remove whitespace characters like `\n` at the end of each line
+  content = [x.strip() for x in content]
+  return content
+
+
 # create the "tmp_files" dir if it doesn't exist already
 tmp_files_name = "tmp_files"
 if not os.path.exists(tmp_files_name):
@@ -64,33 +74,59 @@ ground_truth_files_list.sort()
 unique_classes = set([])
 for txt_file in ground_truth_files_list:
   #print(txt_file)
-  # open txt file lines to a list
-  with open(txt_file) as f:
-    content = f.readlines()
-  ## remove whitespace characters like `\n` at the end of each line
-  content = [x.strip() for x in content]
-  for line in content:
-    class_name, _, _, _, _ = line.split()
+  lines = file_lines_to_list(txt_file)
+  # create ground-truth dictionary
+  bounding_boxes = []
+  for line in lines:
+    class_name, left, top, right, bottom = line.split()
+    bbox = left + " " + top + " " + right + " " +bottom
+    bounding_boxes.append({"class_name":class_name, "bbox":bbox, "used":False})
     # since unique_classes is a set() it only adds if not already present
     unique_classes.add(class_name)
+  # dump bounding_boxes into a ".json" file
+  file_id = txt_file.split(".txt",1)[0]
+  file_id = file_id.split("/",1)[1]
+  with open(tmp_files_name + "/" + file_id + "_ground_truth.json", 'wb') as outfile:
+    json.dump(bounding_boxes, outfile)
 
 # let's sort the classes alphabetically
 unique_classes = sorted(unique_classes)
 #print(unique_classes)
+
+# get a list with the predicted files
+predicted_files_list = glob.glob('predicted/*.txt')
+predicted_files_list.sort()
+
+for class_name in unique_classes:
+  bounding_boxes = []
+  for txt_file in predicted_files_list:
+    print txt_file
+    lines = file_lines_to_list(txt_file)
+    for line in lines:
+      line_class_name, confidence, left, top, right, bottom = line.split()
+      if line_class_name == class_name:
+        print("match")
+        file_id = txt_file.split(".txt",1)[0]
+        file_id = file_id.split("/",1)[1]
+        bbox = left + " " + top + " " + right + " " +bottom
+        bounding_boxes.append({"confidence":confidence, "file_id":file_id, "bbox":bbox})
+        print(bounding_boxes)
+  # sort predictions by decreasing confidence
+  bounding_boxes.sort(key=lambda x:x['confidence'], reverse=True)
+  with open(tmp_files_name + "/" + class_name + "_predictions.json", 'wb') as outfile:
+    json.dump(bounding_boxes, outfile)
+
+
+###
+import sys
+sys.exit()
+###
 
 """
  Calculate the AP for each class
 """
 for class_name in unique_classes:
   print(class_name)
-  # create temporary file:
-  #   (2) <class_name>_predictions.txt
-  ground_truth = {}
-  s = json.dumps(ground_truth)
-  with open("tmp_class_name_ground_truth.json", "w") as f:
-    f.write(s)
-
-  # sort (2) by decreasing confidence
 
   """
    Assign predictions to ground truth objects
