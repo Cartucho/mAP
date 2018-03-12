@@ -1,23 +1,105 @@
 # mAP (mean Average Precision)
 
-(This code is under construction)
+[![New](https://img.shields.io/badge/2018-NEW-brightgreen.svg)](https://github.com/Cartucho/mAP/commits/master)
+[![GitHub stars](https://img.shields.io/github/stars/Cartucho/mAP.svg?style=social&label=Stars)](https://github.com/Cartucho/mAP)
 
 This code will evaluate the performance of your neural net for object recognition.
-The performance will be judged using the mAP criterium defined in the PASCAL VOC 2012 competition but allows you to define your own ground-truth and set of classes.
 
-### Explanation:
-First (**1.**), we calculate the Average Precision (AP), for each of the classes present in the ground-truth. Then (**2.**), we calculate the mean of all the AP's, resulting in a mAP value. A higher mAP value indicates a better performance of your neural net, given your ground-truth.
+(This code is under construction)
 
-##### 1. Calculate AP for each Class
+In practice, a **higher mAP** value indicates a **better performance** of your neural net, given your ground-truth and set of classes.
 
-##### 2. Calculate mAP
+## Table of contents
 
-### Usage
+- [Explanation](#explanation)
+- [Prerequisites](#prerequisites)
+- [Quick start](#quick-start)
+- [Running the code](#running-the-code)
+- [Authors](#authors)
 
-##### Ground-truth
+## Explanation
+The performance of your neural net will be judged using the mAP criterium defined in the [PASCAL VOC 2012 competition](http://host.robots.ox.ac.uk/pascal/VOC/voc2012/). We simply adapted the [official Matlab code](http://host.robots.ox.ac.uk/pascal/VOC/voc2012/#devkit) into Python (in our tests they both give the same results).
 
-A separate text file of ground-truth objects should be generated for each image. In these files, each line should be in the following format:
+First (**1.**), we calculate the Average Precision (AP), for each of the classes present in the ground-truth. Then (**2.**), we calculate the mean of all the AP's, resulting in a mAP value.
+
+#### 1. Calculate AP for each Class
+
+#### 2. Calculate mAP
+
+## Prerequisites
+
+You need to install:
+- [Python](https://www.python.org/downloads/)
+
+Optional:
+- **plot** the results by [installing Matplotlib](https://matplotlib.org/users/installing.html) - Linux, macOS and Windows:
+    1. `python -mpip install -U pip`  
+    2.  `python -mpip install -U matplotlib`
+-  show **animation** by installing [OpenCV](https://www.opencv.org/):
+    1. `python -mpip install -U pip`
+    2. `python -mpip install -U opencv-python`  
+
+## Quick-start
+To start using the mAP you need to clone the repo:
+
 ```
-<class_name> <left> <top> <right> <bottom>
+git clone https://github.com/Cartucho/mAP
 ```
-, where `<class_name>` must have no whitespaces between words (e.g. "diningtable", "pottedplant").
+
+## Running the code
+
+Step by step:
+
+  1. [Create the ground-truth files](#create-the-ground-truth-files)
+  2. Move the ground-truth files into the folder **ground-truth/**
+  3. [Create the predicted objects files](#create-the-predicted-objects-files)
+  4. Move the predictions files into the folder **predicted/**
+  5. Run the code:
+         ```
+         python main.py
+         ```
+
+Optional (if you want to see the **animation**):
+
+  6. Insert the images in the folder **images/**
+
+
+#### Create the ground-truth files
+
+- Create a separate text file with the ground-truth objects for each image.
+- Use **matching names** (e.g. image: "image_1.jpg", ground-truth: "image_1.txt"; "image_2.jpg", "image_2.txt"...).
+- In these files, each line should be in the following format:
+    ```
+    <class_name> <left> <top> <right> <bottom>
+    ```
+    , where `<class_name>` must have no whitespaces between words.
+- E.g. "image_1.txt":
+    ```
+    tvmonitor 2 10 173 238
+    book 439 157 556 241
+    book 437 246 518 351
+    pottedplant 272 190 316 259
+    ```
+#### Create the predicted objects files
+
+- Create a separate text file with the predicted objects for each image.
+- Use **matching names** (e.g. image: "image_1.jpg", predicted: "image_1.txt"; "image_2.jpg", "image_2.txt"...).
+- In these files, each line should be in the following format:
+    ```
+    <class_name> <confidence> <left> <top> <right> <bottom>
+    ```
+    , where `<class_name>` must have no whitespaces between words.
+- E.g. "image_1.txt":
+    ```
+    tvmonitor 0.471781 0 13 174 244
+    cup 0.414941 274 226 301 265
+    book 0.460851 429 219 528 247
+    chair 0.292345 0 199 88 436
+    book 0.269833 433 260 506 336
+    ```
+## Authors:
+* **João Cartucho** - Please give me your feedback: to.cartucho@gmail.com
+
+    Feel free to contribute
+
+    [![GitHub contributors](https://img.shields.io/github/contributors/Cartucho/mAP.svg)](https://github.com/Cartucho/mAP/graphs/contributors)
