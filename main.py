@@ -6,9 +6,19 @@ import operator
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--no_animation', help="If true, no animation is shown.", action="store_true")
-parser.add_argument('--no_plot', help="If true, no plot is shown.", action="store_true")
+parser.add_argument('-na', '--no-animation', help="no animation is shown.", action="store_true")
+parser.add_argument('-np', '--no-plot', help="no plot is shown.", action="store_true")
+parser.add_argument('-q', '--quiet', help="minimalistic console output.", action="store_true")
+# argparse receiving list of classes to be ignored
+parser.add_argument('-i', '--ignore', nargs='+', type=str, help="ignore a list of classes.")
+# mutually exclusive arguments (can't select both)
+group = parser.add_mutually_exclusive_group()
+group.add_argument('-sa', '--slow-animation', help="animation shown slowly.", action="store_true")
+group.add_argument('-fa', '--fast-animation', help="animation shown fast.", action="store_true")
 args = parser.parse_args()
+
+if args.ignore is None:
+  args.ignore = []
 
 if not args.no_animation:
   import cv2
@@ -99,6 +109,9 @@ for txt_file in ground_truth_files_list:
   bounding_boxes = []
   for line in lines:
     class_name, left, top, right, bottom = line.split()
+    # check if class is in the ignore list, if yes skip
+    if class_name in args.ignore:
+      continue
     bbox = left + " " + top + " " + right + " " +bottom
     bounding_boxes.append({"class_name":class_name, "bbox":bbox, "used":False})
     # count that object
@@ -183,7 +196,8 @@ for class_index, class_name in enumerate(unique_classes):
   predictions_data = json.load(open(predictions_file))
   if not predictions_data:
     # no predictions found for that class
-    print(class_name + " AP = 0.00")
+    if not args.quiet:
+      print(class_name + " AP = 0.00")
     continue
   """
    Assign predictions to ground truth objects
@@ -263,7 +277,8 @@ for class_index, class_name in enumerate(unique_classes):
 
   ap = voc_ap(rec, prec)
   sum_AP += ap
-  print(class_name + " AP = %.4f" % ap)
+  if not args.quiet:
+    print(class_name + " AP = %.4f" % ap)
   ap_array[class_index] = ap
 
   """
