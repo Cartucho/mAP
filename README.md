@@ -20,7 +20,7 @@ In practice, a **higher mAP** value indicates a **better performance** of your n
 ## Explanation
 The performance of your neural net will be judged using the mAP criterium defined in the [PASCAL VOC 2012 competition](http://host.robots.ox.ac.uk/pascal/VOC/voc2012/). We simply adapted the [official Matlab code](http://host.robots.ox.ac.uk/pascal/VOC/voc2012/#devkit) into Python (in our tests they both give the same results).
 
-First (**1.**), we calculate the Average Precision (AP), for each of the classes present in the ground-truth. Then (**2.**), we calculate the mean of all the AP's, resulting in a mAP value.
+First (**1.**), we calculate the Average Precision (AP), for each of the classes present in the ground-truth. Then (**2.**), we calculate the mean of all the AP's, resulting in an mAP value.
 
 #### 1. Calculate AP for each Class
 
@@ -61,7 +61,7 @@ Step by step:
 
 Optional (if you want to see the **animation**):
 
-  6. Insert the images in the folder **images/**
+  6. Insert the images into the folder **images/**
 
 
 #### Create the ground-truth files

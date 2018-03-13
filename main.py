@@ -3,6 +3,7 @@ import json
 import os
 import shutil
 import operator
+import sys
 import argparse
 
 parser = argparse.ArgumentParser()
@@ -17,15 +18,34 @@ group.add_argument('-sa', '--slow-animation', help="animation shown slowly.", ac
 group.add_argument('-fa', '--fast-animation', help="animation shown fast.", action="store_true")
 args = parser.parse_args()
 
+# if there are no classes to ignore then replace None by empty list
 if args.ignore is None:
   args.ignore = []
 
-if not args.no_animation:
-  import cv2
+# if there are no images then no animation can be shown
+img_path = 'images'
+if os.path.exists(img_path): 
+  for dirpath, dirnames, files in os.walk(img_path):
+    if not files:
+      # no image files found
+      args.no_animation = True
+else:
+  args.no_animation = True
 
+# try to import OpenCV if the user didn't choose the option --no-animation
+if not args.no_animation:
+  try:
+    import cv2
+  except ImportError:
+    args.no_animation = True
+
+# try to import Matplotlib if the user didn't choose the option --no-plot
 if not args.no_plot:
-  import matplotlib.pyplot as plt
-  import numpy as np
+  try:
+    import matplotlib.pyplot as plt
+    import numpy as np
+  except ImportError:
+    args.no_plot = True
 
 MINOVERLAP = 0.5 # value defined in the PASCAL VOC2012 challenge
 
@@ -94,7 +114,7 @@ if not os.path.exists(results_files_path): # if it doesn't exist already
 """
  Ground-Truth
    Load each of the ground-truth files into a temporary ".json" file.
-   Create a list with all the class names present in the ground-truth (unique_classes).
+   Create a list of all the class names present in the ground-truth (unique_classes).
 """
 # get a list with the ground-truth files
 ground_truth_files_list = glob.glob('ground-truth/*.txt')
@@ -104,10 +124,16 @@ unique_classes = set([])
 counter_per_class = {}
 for txt_file in ground_truth_files_list:
   #print(txt_file)
-  lines = file_lines_to_list(txt_file)
+  file_id = txt_file.split(".txt",1)[0]
+  file_id = file_id.split("/",1)[1]
+  # check if there is a correspondent predicted objects file
+  if not os.path.exists('predicted/' + file_id + ".txt"):
+    print("Error. File not found: predicted/" +  file_id + ".txt")
+    sys.exit(0)
+  lines_list = file_lines_to_list(txt_file)
   # create ground-truth dictionary
   bounding_boxes = []
-  for line in lines:
+  for line in lines_list:
     class_name, left, top, right, bottom = line.split()
     # check if class is in the ignore list, if yes skip
     if class_name in args.ignore:
@@ -122,8 +148,6 @@ for txt_file in ground_truth_files_list:
       counter_per_class[class_name] = 1
       unique_classes.add(class_name)
   # dump bounding_boxes into a ".json" file
-  file_id = txt_file.split(".txt",1)[0]
-  file_id = file_id.split("/",1)[1]
   with open(tmp_files_path + "/" + file_id + "_ground_truth.json", 'w') as outfile:
     json.dump(bounding_boxes, outfile)
 
@@ -207,15 +231,17 @@ for class_index, class_name in enumerate(unique_classes):
   fp = [0] * nd
   for idx, prediction in enumerate(predictions_data):
     file_id = prediction["file_id"]
-    # find ground truth image
-    ground_truth_img = glob.glob1("images", file_id + "*")
-    #tifCounter = len(glob.glob1(myPath,"*.tif"))
-    if len(ground_truth_img) == 0:
-      print("Error: unrecognized image " + file_id)
-      sys.exit(0)
-    elif len(ground_truth_img) > 1:
-      print("Error: multiple image " + file_id)
-      sys.exit(0)
+    # if show animation
+    if not args.no_animation:
+      # find ground truth image
+      ground_truth_img = glob.glob1(img_path, file_id + ".*")
+      #tifCounter = len(glob.glob1(myPath,"*.tif"))
+      if len(ground_truth_img) == 0:
+        print("Error. Image not found with id: " + file_id)
+        sys.exit(0)
+      elif len(ground_truth_img) > 1:
+        print("Error. Multiple image with id: " + file_id)
+        sys.exit(0)
     # assign prediction to ground truth object if any
     #   open ground-truth with that file_id
     gt_file = tmp_files_path + "/" + file_id + "_ground_truth.json"

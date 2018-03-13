@@ -13,7 +13,7 @@ with open("class_list.txt") as f:
 #print(obj_list[0])
 
 # change directory to the one with the files to be changed
-path_to_folder = sys.argv[1]
+path_to_folder = '../ground_truth'
 #print(path_to_folder)
 os.chdir(path_to_folder)
 
