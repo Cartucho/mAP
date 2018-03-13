@@ -2,6 +2,7 @@ import glob
 import json
 import os
 import shutil
+import operator
 import argparse
 
 parser = argparse.ArgumentParser()
@@ -19,6 +20,9 @@ if not args.no_plot:
 MINOVERLAP = 0.5 # value defined in the PASCAL VOC2012 challenge
 
 
+"""
+ Calculate the AP given the recall and precision array
+"""
 def voc_ap(rec, prec):
   """
   --- Official matlab code VOC2012---
@@ -54,6 +58,9 @@ def voc_ap(rec, prec):
   return ap
 
 
+"""
+ Convert the lines of a file to a list
+"""
 def file_lines_to_list(path):
   # open txt file lines to a list
   with open(path) as f:
@@ -63,10 +70,16 @@ def file_lines_to_list(path):
   return content
 
 
-# create the "tmp_files" dir if it doesn't exist already
+"""
+ Create a "tmp_files/" and "results/" directory
+"""
 tmp_files_path = "tmp_files"
-if not os.path.exists(tmp_files_path):
+if not os.path.exists(tmp_files_path): # if it doesn't exist already
   os.makedirs(tmp_files_path)
+results_files_path = "results"
+if not os.path.exists(results_files_path): # if it doesn't exist already
+  os.makedirs(results_files_path)
+
 
 """
  Ground-Truth
@@ -98,13 +111,36 @@ for txt_file in ground_truth_files_list:
   # dump bounding_boxes into a ".json" file
   file_id = txt_file.split(".txt",1)[0]
   file_id = file_id.split("/",1)[1]
-  with open(tmp_files_path + "/" + file_id + "_ground_truth.json", 'wb') as outfile:
+  with open(tmp_files_path + "/" + file_id + "_ground_truth.json", 'w') as outfile:
     json.dump(bounding_boxes, outfile)
 
 # let's sort the classes alphabetically
 unique_classes = sorted(unique_classes)
+n_classes = len(unique_classes)
 #print(unique_classes)
 #print(counter_per_class)
+
+"""
+ Plot the total number of occurences of each class in the ground-truth
+"""
+if not args.no_plot:
+    # sort the counter_per_class dictionary by value into a list of tuples
+    sorted_counter_per_class = sorted(counter_per_class.items(), key=operator.itemgetter(1), reverse=True)
+    # unpacking the list of tuples into two lists
+    sorted_keys, sorted_values = zip(*sorted_counter_per_class)
+    plt.bar(range(n_classes), sorted_values, align='center')
+    plt.xticks(range(n_classes), sorted_keys, rotation='vertical')
+    # set window title
+    fig = plt.gcf() # gcf - get current figure
+    fig.canvas.set_window_title('Ground-Truth Info')
+    # set plot title
+    plt.title("Total of ground-truth files = " + str(len(ground_truth_files_list)))
+    # set axis titles
+    #plt.xlabel('classes')
+    plt.ylabel('Number of objects per class')
+    # adjust size of window
+    fig.tight_layout()
+    plt.show()
 
 """
  Predicted
@@ -130,7 +166,7 @@ for class_name in unique_classes:
         #print(bounding_boxes)
   # sort predictions by decreasing confidence
   bounding_boxes.sort(key=lambda x:x['confidence'], reverse=True)
-  with open(tmp_files_path + "/" + class_name + "_predictions.json", 'wb') as outfile:
+  with open(tmp_files_path + "/" + class_name + "_predictions.json", 'w') as outfile:
     json.dump(bounding_boxes, outfile)
 
 """
@@ -138,7 +174,6 @@ for class_name in unique_classes:
 """
 sum_AP = 0.0
 # create array of zeros to store all AP's
-n_classes = len(unique_classes)
 ap_array = [0] * n_classes
 for class_index, class_name in enumerate(unique_classes):
   """
@@ -197,7 +232,7 @@ for class_index, class_name in enumerate(unique_classes):
         tp[idx] = 1
         gt_match["used"] = True
         # update the ".json" file
-        with open(gt_file, 'wb') as f:
+        with open(gt_file, 'w') as f:
             f.write(json.dumps(ground_truth_data))
       else:
         # false positive (multiple detection)
@@ -231,6 +266,9 @@ for class_index, class_name in enumerate(unique_classes):
   print(class_name + " AP = %.4f" % ap)
   ap_array[class_index] = ap
 
+  """
+   Draw plot
+  """
   if not args.no_plot:
     plt.plot(rec, prec, '-o')
     # set window title
@@ -247,12 +285,15 @@ for class_index, class_name in enumerate(unique_classes):
     axes.set_xlim([0.0,1.0])
     axes.set_ylim([0.0,1.05])
     # wait for button to be pressed
-    #while not plt.waitforbuttonpress(): pass
+    while not plt.waitforbuttonpress(): pass
     plt.cla() # clear axes for next plot
 
 mAP = sum_AP / n_classes
 print("mAP = " + str(mAP))
 
+"""
+ Draw mAP plot (Show AP's of all classes in decreasing order)
+"""
 if not args.no_plot:
     # sort classes and AP by decreasing value
     unique_classes = np.array(unique_classes)

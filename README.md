@@ -66,7 +66,7 @@ Optional (if you want to see the **animation**):
 
 #### Create the ground-truth files
 
-- Create a separate text file with the ground-truth objects for each image.
+- Create a separate ground-truth text file for each image.
 - Use **matching names** (e.g. image: "image_1.jpg", ground-truth: "image_1.txt"; "image_2.jpg", "image_2.txt"...).
 - In these files, each line should be in the following format:
     ```
@@ -82,7 +82,7 @@ Optional (if you want to see the **animation**):
     ```
 #### Create the predicted objects files
 
-- Create a separate text file with the predicted objects for each image.
+- Create a separate predicted objects text file for each image.
 - Use **matching names** (e.g. image: "image_1.jpg", predicted: "image_1.txt"; "image_2.jpg", "image_2.txt"...).
 - In these files, each line should be in the following format:
     ```
