@@ -12,10 +12,6 @@ parser.add_argument('-np', '--no-plot', help="no plot is shown.", action="store_
 parser.add_argument('-q', '--quiet', help="minimalistic console output.", action="store_true")
 # argparse receiving list of classes to be ignored
 parser.add_argument('-i', '--ignore', nargs='+', type=str, help="ignore a list of classes.")
-# mutually exclusive arguments (can't select both)
-group = parser.add_mutually_exclusive_group()
-group.add_argument('-sa', '--slow-animation', help="animation shown slowly.", action="store_true")
-group.add_argument('-fa', '--fast-animation', help="animation shown fast.", action="store_true")
 args = parser.parse_args()
 
 # if there are no classes to ignore then replace None by empty list
@@ -128,8 +124,12 @@ tmp_files_path = "tmp_files"
 if not os.path.exists(tmp_files_path): # if it doesn't exist already
   os.makedirs(tmp_files_path)
 results_files_path = "results"
-if not os.path.exists(results_files_path): # if it doesn't exist already
-  os.makedirs(results_files_path)
+if os.path.exists(results_files_path): # if it exist already
+  # reset the results directory
+  shutil.rmtree(results_files_path)
+
+os.makedirs(results_files_path)
+os.makedirs(results_files_path + "/classes")
 
 
 """
@@ -198,8 +198,11 @@ if draw_plot:
     plt.ylabel('Number of objects per class')
     # adjust size of window
     fig.tight_layout()
-    plt.show()
-
+    #plt.show()
+    # save the plot
+    fig.savefig(results_files_path + "/Ground-Truth Info.jpg")
+    # clear the plot
+    plt.clf()
 """
  Predicted
    Load each of the predicted files into a temporary ".json" file.
@@ -242,7 +245,7 @@ for class_index, class_name in enumerate(unique_classes):
   if not predictions_data:
     # no predictions found for that class
     if not args.quiet:
-      print(class_name + " AP = 0.00")
+      print(class_name + " AP = 0.00%")
     continue # skip this class
   """
    Assign predictions to ground truth objects
@@ -316,7 +319,7 @@ for class_index, class_name in enumerate(unique_classes):
       # false positive
       fp[idx] = 1
       if ovmax > 0:
-        status = "insufficient overlap"
+        status = "poor overlap"
 
     if show_animation:
       #text_status = " Status: " + status
@@ -325,7 +328,7 @@ for class_index, class_name in enumerate(unique_classes):
       margin = 10
       text = "Image: " + ground_truth_img[0] + " "
       img, total_text_width = draw_text_in_image(img, text, (10, height - margin), (255,255,255), 0)
-      text = "Class: " + class_name + " "
+      text = "Class [" + str(class_index) + "/" + str(n_classes) + "]: " + class_name + " "
       img, total_text_width = draw_text_in_image(img, text, (10 + total_text_width, height - margin), (255,200,100), total_text_width)
       text = "Status: " + status + " "
       if status == "match":
@@ -341,7 +344,7 @@ for class_index, class_name in enumerate(unique_classes):
       else:
         cv2.rectangle(img,(int(bb[0]),int(bb[1])),(int(bb[2]),int(bb[3])),(0,0,255),2)
       cv2.imshow("Animation", img)
-      cv2.waitKey(50)
+      cv2.waitKey(20)
 
   #print(tp)
   # compute precision/recall
@@ -366,7 +369,7 @@ for class_index, class_name in enumerate(unique_classes):
   ap = voc_ap(rec, prec)
   sum_AP += ap
   if not args.quiet:
-    print(class_name + " AP = %.4f" % ap)
+    print(class_name + " AP = {0:.2f}%".format(ap*100))
   ap_array[class_index] = ap
 
   """
@@ -378,7 +381,7 @@ for class_index, class_name in enumerate(unique_classes):
     fig = plt.gcf() # gcf - get current figure
     fig.canvas.set_window_title('AP ' + class_name)
     # set plot title
-    plt.title('class: ' + class_name + ", AP = %.4f" % ap)
+    plt.title('class: ' + class_name + ", AP = {0:.2f}%".format(ap*100))
     #plt.suptitle('This is a somewhat long figure title', fontsize=16)
     # set axis titles
     plt.xlabel('recall')
@@ -388,15 +391,17 @@ for class_index, class_name in enumerate(unique_classes):
     axes.set_xlim([0.0,1.0])
     axes.set_ylim([0.0,1.05]) # .05 to give some extra space
     # wait for button to be pressed
-    plt.show()
-    #while not plt.waitforbuttonpress(): pass
+    #plt.show() # normal display
+    #while not plt.waitforbuttonpress(): pass # wait for key display
+    # save the plot
+    fig.savefig(results_files_path + "/classes/" + class_name + ".jpg")
     plt.cla() # clear axes for next plot
 
 if show_animation:
   cv2.destroyAllWindows()
 
 mAP = sum_AP / n_classes
-print("mAP = " + str(mAP))
+print("mAP = {0:.2f}%".format(mAP*100))
 
 """
  Draw mAP plot (Show AP's of all classes in decreasing order)
@@ -415,12 +420,13 @@ if draw_plot:
     fig = plt.gcf() # gcf - get current figure
     fig.canvas.set_window_title('mAP')
     # set plot title
-    plt.title("mAP = %.4f" % mAP)
+    plt.title("mAP = {0:.2f}%".format(mAP*100))
     # set axis titles
     #plt.xlabel('classes')
     plt.ylabel('Average Precision')
     # adjust size of window
     fig.tight_layout()
+    fig.savefig(results_files_path + "/mAP.jpg")
     plt.show()
 
 # remove the tmp_files directory
