@@ -3,7 +3,6 @@ pillow 378 151 513 239
 pillow 490 140 613 234
 cabinetry 205 10 384 124
 door 84 4 172 88
-doorhandle 84 47 178 81
 chair 2 91 373 475
 chair 211 68 295 191
 chair 520 77 603 158

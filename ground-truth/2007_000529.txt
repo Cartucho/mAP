@@ -5,4 +5,3 @@ pottedplant 391 5 492 146
 tvmonitor 506 20 639 242
 sofa 3 143 154 476
 coffeetable 363 209 611 414
-candle 441 194 473 237

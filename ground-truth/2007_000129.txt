@@ -3,7 +3,5 @@ chair 253 79 402 333
 diningtable 261 112 491 370
 cabinetry 209 4 504 228
 bottle 393 82 442 154
-envelope 358 140 456 167
 cup 316 114 366 149
 doll 433 131 448 164
-doorhandle 5 47 141 101

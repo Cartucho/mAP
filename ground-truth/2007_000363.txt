@@ -8,7 +8,6 @@ pillow 228 115 329 159
 pillow 330 125 416 155
 shelf 391 1 499 151
 windowblind 485 1 558 85
-lamp 62 1 109 143
 pottedplant 89 107 121 144
 book 450 98 479 105
 book 411 91 432 110

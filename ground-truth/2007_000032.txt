@@ -1,5 +1,4 @@
 pictureframe 247 205 292 265
-lamp 406 230 449 312
 heater 241 157 418 245
 pottedplant 339 192 385 264
 tvmonitor 33 18 242 231
@@ -8,8 +7,6 @@ book 514 159 639 251
 book 477 401 592 476
 book 593 330 637 387
 bookcase 464 2 637 473
-glasses 301 292 353 319
-glasses 365 308 413 344
 vase 343 235 368 259
 coffeetable 245 249 483 476
 coffeetable 1 215 172 455

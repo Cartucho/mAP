@@ -1,6 +1,5 @@
 cabinetry 5 6 502 270
 door 509 3 636 162
-doorhandle 518 56 636 109
 chair 260 187 455 473
 chair 480 278 635 472
 diningtable 305 163 636 461

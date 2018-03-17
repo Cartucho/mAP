@@ -7,4 +7,3 @@ sofa 5 150 453 450
 vase 155 149 197 184
 coffeetable 289 151 443 205
 coffeetable 177 134 279 193
-candle 381 138 399 171

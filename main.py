@@ -33,17 +33,21 @@ else:
   args.no_animation = True
 
 # try to import OpenCV if the user didn't choose the option --no-animation
+show_animation = False
 if not args.no_animation:
   try:
     import cv2
+    show_animation = True
   except ImportError:
     args.no_animation = True
 
 # try to import Matplotlib if the user didn't choose the option --no-plot
+draw_plot = False
 if not args.no_plot:
   try:
     import matplotlib.pyplot as plt
     import numpy as np
+    draw_plot = True
   except ImportError:
     args.no_plot = True
 
@@ -98,6 +102,23 @@ def file_lines_to_list(path):
   # remove whitespace characters like `\n` at the end of each line
   content = [x.strip() for x in content]
   return content
+
+"""
+ Draws text in image
+"""
+def draw_text_in_image(img, text, pos, color, total_text_width):
+  font = cv2.FONT_HERSHEY_PLAIN
+  fontScale = 1
+  lineType = 1
+  bottomLeftCornerOfText = pos
+  cv2.putText(img, text,
+      bottomLeftCornerOfText,
+      font,
+      fontScale,
+      color,
+      lineType)
+  text_width, _ = cv2.getTextSize(text, font, fontScale, lineType)[0]
+  return img, (total_text_width + text_width)
 
 
 """
@@ -160,7 +181,7 @@ n_classes = len(unique_classes)
 """
  Plot the total number of occurences of each class in the ground-truth
 """
-if not args.no_plot:
+if draw_plot:
     # sort the counter_per_class dictionary by value into a list of tuples
     sorted_counter_per_class = sorted(counter_per_class.items(), key=operator.itemgetter(1), reverse=True)
     # unpacking the list of tuples into two lists
@@ -222,7 +243,7 @@ for class_index, class_name in enumerate(unique_classes):
     # no predictions found for that class
     if not args.quiet:
       print(class_name + " AP = 0.00")
-    continue
+    continue # skip this class
   """
    Assign predictions to ground truth objects
   """
@@ -231,8 +252,7 @@ for class_index, class_name in enumerate(unique_classes):
   fp = [0] * nd
   for idx, prediction in enumerate(predictions_data):
     file_id = prediction["file_id"]
-    # if show animation
-    if not args.no_animation:
+    if show_animation:
       # find ground truth image
       ground_truth_img = glob.glob1(img_path, file_id + ".*")
       #tifCounter = len(glob.glob1(myPath,"*.tif"))
@@ -242,16 +262,25 @@ for class_index, class_name in enumerate(unique_classes):
       elif len(ground_truth_img) > 1:
         print("Error. Multiple image with id: " + file_id)
         sys.exit(0)
+      else: # found image
+        #print(img_path + "/" + ground_truth_img[0])
+        # Load image
+        img = cv2.imread(img_path + "/" + ground_truth_img[0])
+        # Add bottom border to image
+        bottom_border = 30
+        BLACK = [0, 0, 0]
+        img = cv2.copyMakeBorder(img, 0, bottom_border, 0, 0, cv2.BORDER_CONSTANT, value=BLACK)
     # assign prediction to ground truth object if any
     #   open ground-truth with that file_id
     gt_file = tmp_files_path + "/" + file_id + "_ground_truth.json"
     ground_truth_data = json.load(open(gt_file))
     ovmax = -1
     gt_match = -1
+    # load prediction bounding-box
+    bb = [ float(x) for x in prediction["bbox"].split() ]
     for obj in ground_truth_data:
       # look for a class_name match
       if obj["class_name"] == class_name:
-        bb = [ float(x) for x in prediction["bbox"].split() ]
         bbgt = [ float(x) for x in obj["bbox"].split() ]
         bi = [max(bb[0],bbgt[0]), max(bb[1],bbgt[1]), min(bb[2],bbgt[2]), min(bb[3],bbgt[3])]
         iw = bi[2] - bi[0] + 1
@@ -266,6 +295,8 @@ for class_index, class_name in enumerate(unique_classes):
             gt_match = obj
 
     # assign prediction as true positive or false positive
+    if show_animation:
+      status = "no match"
     if ovmax >= MINOVERLAP:
       if not bool(gt_match["used"]):
         # true positive
@@ -274,12 +305,43 @@ for class_index, class_name in enumerate(unique_classes):
         # update the ".json" file
         with open(gt_file, 'w') as f:
             f.write(json.dumps(ground_truth_data))
+        if show_animation:
+          status = "match"
       else:
         # false positive (multiple detection)
         fp[idx] = 1
+        if show_animation:
+          status = "repeated match"
     else:
       # false positive
       fp[idx] = 1
+      if ovmax > 0:
+        status = "insufficient overlap"
+
+    if show_animation:
+      #text_status = " Status: " + status
+
+      height, widht = img.shape[:2]
+      margin = 10
+      text = "Image: " + ground_truth_img[0] + " "
+      img, total_text_width = draw_text_in_image(img, text, (10, height - margin), (255,255,255), 0)
+      text = "Class: " + class_name + " "
+      img, total_text_width = draw_text_in_image(img, text, (10 + total_text_width, height - margin), (255,200,100), total_text_width)
+      text = "Status: " + status + " "
+      if status == "match":
+        img, total_text_width = draw_text_in_image(img, text, (10 + total_text_width, height - margin), (0,255,0), total_text_width)
+      else:
+        img, total_text_width = draw_text_in_image(img, text, (10 + total_text_width, height - margin), (0,0,255), total_text_width)
+
+      if ovmax > 0: # if there is intersections between the bounding-boxes
+        bbgt = [ float(x) for x in gt_match["bbox"].split() ]
+        cv2.rectangle(img,(int(bbgt[0]),int(bbgt[1])),(int(bbgt[2]),int(bbgt[3])),(255,200,100),2)
+      if status == "match":
+        cv2.rectangle(img,(int(bb[0]),int(bb[1])),(int(bb[2]),int(bb[3])),(0,255,0),2)
+      else:
+        cv2.rectangle(img,(int(bb[0]),int(bb[1])),(int(bb[2]),int(bb[3])),(0,0,255),2)
+      cv2.imshow("Animation", img)
+      cv2.waitKey(50)
 
   #print(tp)
   # compute precision/recall
@@ -310,7 +372,7 @@ for class_index, class_name in enumerate(unique_classes):
   """
    Draw plot
   """
-  if not args.no_plot:
+  if draw_plot:
     plt.plot(rec, prec, '-o')
     # set window title
     fig = plt.gcf() # gcf - get current figure
@@ -324,10 +386,14 @@ for class_index, class_name in enumerate(unique_classes):
     # optional - set axes
     axes = plt.gca() # gca - get current axes
     axes.set_xlim([0.0,1.0])
-    axes.set_ylim([0.0,1.05])
+    axes.set_ylim([0.0,1.05]) # .05 to give some extra space
     # wait for button to be pressed
-    while not plt.waitforbuttonpress(): pass
+    plt.show()
+    #while not plt.waitforbuttonpress(): pass
     plt.cla() # clear axes for next plot
+
+if show_animation:
+  cv2.destroyAllWindows()
 
 mAP = sum_AP / n_classes
 print("mAP = " + str(mAP))
@@ -335,7 +401,7 @@ print("mAP = " + str(mAP))
 """
  Draw mAP plot (Show AP's of all classes in decreasing order)
 """
-if not args.no_plot:
+if draw_plot:
     # sort classes and AP by decreasing value
     unique_classes = np.array(unique_classes)
     ap_array = np.array(ap_array)

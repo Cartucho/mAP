@@ -2,10 +2,8 @@ pillow 247 168 373 300
 pillow 190 162 296 219
 pillow 296 149 400 239
 cabinetry 79 5 264 153
-doorhandle 6 49 32 89
 chair 4 97 259 476
 chair 389 77 545 263
 diningtable 107 93 231 176
 sofa 85 137 521 473
 remote 378 229 436 257
-envelope 154 82 188 109

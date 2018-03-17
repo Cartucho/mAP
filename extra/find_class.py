@@ -11,8 +11,10 @@ path = sys.argv[2]
 
 os.chdir(path)
 
+file_list = glob.glob('*.txt')
+file_list.sort()
 # iterate through the text files
-for txt_file in glob.glob('*.txt'):
+for txt_file in file_list:
   # open txt file lines to a list
   with open(txt_file) as f:
     content = f.readlines()
@@ -23,3 +25,4 @@ for txt_file in glob.glob('*.txt'):
     class_name = line.split()[0]
     if class_name == searching_class_name:
       print(txt_file)
+      break

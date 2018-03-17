@@ -1,9 +1,7 @@
 cabinetry 6 5 468 217
 door 501 8 639 257
-doorhandle 511 47 638 111
 chair 314 164 457 206
 chair 150 331 539 472
 chair 6 184 158 466
 diningtable 22 192 613 474
 tincan 323 172 366 262
-envelope 393 214 517 313

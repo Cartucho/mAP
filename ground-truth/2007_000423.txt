@@ -1,5 +1,3 @@
 cabinetry 391 6 638 225
 door 92 1 279 245
-doorhandle 98 47 276 107
 diningtable 70 209 639 461
-envelope 399 157 545 253

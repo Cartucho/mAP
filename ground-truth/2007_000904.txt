@@ -1,7 +1,6 @@
 cabinetry 5 5 253 204
 cabinetry 388 11 570 152
 door 256 14 335 100
-doorhandle 253 53 335 83
 chair 186 114 288 264
 chair 316 124 411 274
 chair 452 66 525 204

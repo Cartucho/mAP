@@ -5,5 +5,4 @@ diningtable 4 95 341 455
 chair 16 149 206 471
 chair 338 92 358 171
 pictureframe 576 107 603 134
-lamp 618 12 640 59
 windowblind 561 4 633 70

@@ -1,6 +1,5 @@
 pictureframe 412 130 439 157
 pictureframe 205 100 244 127
-lamp 494 131 517 171
 heater 414 115 500 157
 windowblind 246 4 317 64
 pottedplant 168 8 236 152
@@ -9,7 +8,5 @@ pottedplant 460 123 480 162
 chair 8 86 324 449
 tvmonitor 283 42 418 144
 sofa 2 115 232 364
-glasses 441 154 468 169
 coffeetable 235 136 374 227
 coffeetable 423 153 529 249
-candle 288 126 305 152

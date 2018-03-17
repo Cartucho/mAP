@@ -1,9 +1,6 @@
 cabinetry 8 7 563 247
 door 571 7 640 172
-doorhandle 580 53 636 110
 chair 393 174 616 456
 diningtable 446 165 635 462
-orange 18 87 49 117
 countertop 1 116 128 479
-banana 2 110 81 139
 bowl 589 153 635 195

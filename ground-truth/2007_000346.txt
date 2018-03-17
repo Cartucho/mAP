@@ -1,2 +1,1 @@
 door 3 1 299 475
-doorhandle 3 1 277 204
