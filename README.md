@@ -5,7 +5,7 @@
 
 This code will evaluate the performance of your neural net for object recognition.
 
-(This code is under construction)
+<img src="https://user-images.githubusercontent.com/15831541/37559643-6738bcc8-2a21-11e8-8a07-ed836f19c5d9.gif" width="500" height="300" />
 
 In practice, a **higher mAP** value indicates a **better performance** of your neural net, given your ground-truth and set of classes.
 
@@ -24,7 +24,11 @@ First (**1.**), we calculate the Average Precision (AP), for each of the classes
 
 #### 1. Calculate AP for each Class
 
+<img src="https://user-images.githubusercontent.com/15831541/37559147-e45b3dc4-2a18-11e8-8956-1ccccf83d1c8.jpg" width="60%" height="60%" />
+
 #### 2. Calculate mAP
+
+<img src="https://user-images.githubusercontent.com/15831541/37559152-eed3f002-2a18-11e8-83e0-2da3c898194a.jpg" width="60%" height="60%" />
 
 ## Prerequisites
 

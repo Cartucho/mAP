@@ -384,8 +384,8 @@ for class_index, class_name in enumerate(unique_classes):
     plt.title('class: ' + class_name + ", AP = {0:.2f}%".format(ap*100))
     #plt.suptitle('This is a somewhat long figure title', fontsize=16)
     # set axis titles
-    plt.xlabel('recall')
-    plt.ylabel('precision')
+    plt.xlabel('Recall')
+    plt.ylabel('Precision')
     # optional - set axes
     axes = plt.gca() # gca - get current axes
     axes.set_xlim([0.0,1.0])
