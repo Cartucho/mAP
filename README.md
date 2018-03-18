@@ -5,7 +5,9 @@
 
 This code will evaluate the performance of your neural net for object recognition.
 
-<img src="https://user-images.githubusercontent.com/15831541/37559643-6738bcc8-2a21-11e8-8a07-ed836f19c5d9.gif" width="500" height="300" />
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/15831541/37559643-6738bcc8-2a21-11e8-8a07-ed836f19c5d9.gif" width="450" height="300" />
+</p>
 
 In practice, a **higher mAP** value indicates a **better performance** of your neural net, given your ground-truth and set of classes.
 
@@ -20,13 +22,26 @@ In practice, a **higher mAP** value indicates a **better performance** of your n
 ## Explanation
 The performance of your neural net will be judged using the mAP criterium defined in the [PASCAL VOC 2012 competition](http://host.robots.ox.ac.uk/pascal/VOC/voc2012/). We simply adapted the [official Matlab code](http://host.robots.ox.ac.uk/pascal/VOC/voc2012/#devkit) into Python (in our tests they both give the same results).
 
-First (**1.**), we calculate the Average Precision (AP), for each of the classes present in the ground-truth. Then (**2.**), we calculate the mean of all the AP's, resulting in an mAP value.
+First (**1.**), we calculate the Average Precision (AP), for each of the classes present in the ground-truth. Finally (**2.**), we calculate the mAP (mean Average Precision) value.
 
 #### 1. Calculate AP for each Class
 
+For each class:
+
+First, your neural net **predicted objects** are sorted by decreasing confidence. Then, they are assigned to **ground-truth objects**. If they share the **same label and an IoU > 0.5** (Intersection over Union greater than 50%), it is considered a true positive if that ground-truth object was not used before (to avoid multiple detections of the same object). 
+
+To calculate the average precision (AP) we start by calculating the precision/recall curve for each class present in the ground-truth. E.g:
+
 <img src="https://user-images.githubusercontent.com/15831541/37559147-e45b3dc4-2a18-11e8-8956-1ccccf83d1c8.jpg" width="60%" height="60%" />
 
-#### 2. Calculate mAP
+Then we compute a version of the measured precision/recall curve with precision monotonically decreasing, by setting the precision for recall `r` to the maximum precision obtained for any recall `r' > r`.
+
+Finally, we compute the AP as the area under this curve by numerical integration.
+No approximation is involved since the curve is piecewise constant.
+
+#### 2. Calculate mAP (mean Average Precision)
+
+Finally, we calculate the mean of all the AP's, resulting in an mAP value from 0% to 100%. E.g:
 
 <img src="https://user-images.githubusercontent.com/15831541/37559152-eed3f002-2a18-11e8-83e0-2da3c898194a.jpg" width="60%" height="60%" />
 
