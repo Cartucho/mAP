@@ -30,7 +30,7 @@ For each class:
 
 First, your neural net **predicted objects** are sorted by decreasing confidence. Then, they are assigned to **ground-truth objects**. If they share the **same label and an IoU > 0.5** (Intersection over Union greater than 50%), it is considered a true positive if that ground-truth object was not used before (to avoid multiple detections of the same object). 
 
-To calculate the average precision (AP) we start by calculating the precision/recall curve for each class present in the ground-truth. E.g:
+Then, we calculate the precision/recall curve. E.g:
 
 <img src="https://user-images.githubusercontent.com/15831541/37559147-e45b3dc4-2a18-11e8-8956-1ccccf83d1c8.jpg" width="60%" height="60%" />
 
