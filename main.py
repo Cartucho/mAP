@@ -52,6 +52,9 @@ MINOVERLAP = 0.5 # value defined in the PASCAL VOC2012 challenge
 
 """
  Calculate the AP given the recall and precision array
+  1st) We compute a version of the measured precision/recall curve with
+       precision monotonically decreasing
+  2nd) We compute the AP as the area under this curve by numerical integration.
 """
 def voc_ap(rec, prec):
   """
@@ -85,7 +88,7 @@ def voc_ap(rec, prec):
   ap = 0.0
   for i in ind:
     ap += ((mrec[i]-mrec[i-1])*mpre[i])
-  return ap
+  return ap, mrec, mpre
 
 
 """
@@ -128,8 +131,9 @@ if os.path.exists(results_files_path): # if it exist already
   # reset the results directory
   shutil.rmtree(results_files_path)
 
-os.makedirs(results_files_path)
-os.makedirs(results_files_path + "/classes")
+if draw_plot:
+  os.makedirs(results_files_path)
+  os.makedirs(results_files_path + "/classes")
 
 
 """
@@ -366,7 +370,7 @@ for class_index, class_name in enumerate(unique_classes):
     prec[idx] = float(tp[idx]) / (fp[idx] + tp[idx])
   #print(prec)
 
-  ap = voc_ap(rec, prec)
+  ap, mrec, mprec = voc_ap(rec, prec)
   sum_AP += ap
   if not args.quiet:
     print(class_name + " AP = {0:.2f}%".format(ap*100))
@@ -377,6 +381,9 @@ for class_index, class_name in enumerate(unique_classes):
   """
   if draw_plot:
     plt.plot(rec, prec, '-o')
+    #plt.plot(mrec, mprec, '-')
+    plt.fill_between(mrec, 0, mprec, alpha=0.2, edgecolor='r')
+    #plt.fill(mprec, 0, 'b', alpha=0.2, edgecolor='r')
     # set window title
     fig = plt.gcf() # gcf - get current figure
     fig.canvas.set_window_title('AP ' + class_name)

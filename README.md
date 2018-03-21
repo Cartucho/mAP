@@ -24,24 +24,26 @@ The performance of your neural net will be judged using the mAP criterium define
 
 First (**1.**), we calculate the Average Precision (AP), for each of the classes present in the ground-truth. Finally (**2.**), we calculate the mAP (mean Average Precision) value.
 
-#### 1. Calculate AP for each Class
+#### 1. Calculate AP
 
 For each class:
 
-First, your neural net **predicted objects** are sorted by decreasing confidence. Then, they are assigned to **ground-truth objects**. We have "a match" when they share the **same label and an IoU > 0.5** (Intersection over Union greater than 50%). This "match" is considered a true positive if that ground-truth object was not already used (to avoid multiple detections of the same object). 
+First, your neural net **predicted objects** are sorted by decreasing confidence and are assigned to **ground-truth objects**. We have "a match" when they share the **same label and an IoU > 0.5** (Intersection over Union greater than 50%). This "match" is considered a true positive if that ground-truth object has not been already used (to avoid multiple detections of the same object). 
 
-Then, we calculate the precision/recall curve. E.g:
+<img src="https://user-images.githubusercontent.com/15831541/37725175-45b9e1a6-2d2a-11e8-8c15-2fb4d716ca9a.png" width="35%" height="35%" />
 
-<img src="https://user-images.githubusercontent.com/15831541/37559147-e45b3dc4-2a18-11e8-8956-1ccccf83d1c8.jpg" width="60%" height="60%" />
+Using this criterium, we calculate the precision/recall curve. E.g:
 
-Then we compute a version of the measured precision/recall curve with precision monotonically decreasing, by setting the precision for recall `r` to the maximum precision obtained for any recall `r' > r`.
+<img src="https://user-images.githubusercontent.com/15831541/37722176-3fd0f3e4-2d23-11e8-961c-29001ea2a6b8.png" width="65%" height="65%" />
 
-Finally, we compute the AP as the area under this curve by numerical integration.
+Then we compute a version of the measured precision/recall curve with **precision monotonically decreasing** (shown in light red), by setting the precision for recall `r` to the maximum precision obtained for any recall `r' > r`.
+
+Finally, we compute the AP as the **area under this curve** (shown in light blue) by numerical integration.
 No approximation is involved since the curve is piecewise constant.
 
-#### 2. Calculate mAP (mean Average Precision)
+#### 2. Calculate mAP
 
-Finally, we calculate the mean of all the AP's, resulting in an mAP value from 0% to 100%. E.g:
+We calculate the mean of all the AP's, resulting in an mAP value from 0 to 100%. E.g:
 
 <img src="https://user-images.githubusercontent.com/15831541/37559152-eed3f002-2a18-11e8-83e0-2da3c898194a.jpg" width="60%" height="60%" />
 
