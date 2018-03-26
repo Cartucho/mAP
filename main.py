@@ -6,17 +6,25 @@ import operator
 import sys
 import argparse
 
+MINOVERLAP = 0.5 # value defined in the PASCAL VOC2012 challenge
+
 parser = argparse.ArgumentParser()
 parser.add_argument('-na', '--no-animation', help="no animation is shown.", action="store_true")
 parser.add_argument('-np', '--no-plot', help="no plot is shown.", action="store_true")
 parser.add_argument('-q', '--quiet', help="minimalistic console output.", action="store_true")
 # argparse receiving list of classes to be ignored
 parser.add_argument('-i', '--ignore', nargs='+', type=str, help="ignore a list of classes.")
+# argparse receiving list of classes with specific IoU
+parser.add_argument('--set-class-iou', nargs='+', type=str, help="set IoU for a specific class.")
 args = parser.parse_args()
 
 # if there are no classes to ignore then replace None by empty list
 if args.ignore is None:
   args.ignore = []
+
+specific_iou_flagged = False
+if args.set_class_iou is not None:
+  specific_iou_flagged = True
 
 # if there are no images then no animation can be shown
 img_path = 'images'
@@ -47,8 +55,25 @@ if not args.no_plot:
   except ImportError:
     args.no_plot = True
 
-MINOVERLAP = 0.5 # value defined in the PASCAL VOC2012 challenge
+"""
+ throw error and exit
+"""
+def error(msg):
+  print(msg)
+  sys.exit(0)
 
+"""
+ check if the number is a float
+"""
+def is_float_between_0_and_1(value):
+  try:
+    val = float(value)
+    if val > 0.0 and val < 1.0:
+      return True
+    else:
+      return False
+  except ValueError:
+    return False
 
 """
  Calculate the AP given the recall and precision array
@@ -153,8 +178,7 @@ for txt_file in ground_truth_files_list:
   file_id = file_id.split("/",1)[1]
   # check if there is a correspondent predicted objects file
   if not os.path.exists('predicted/' + file_id + ".txt"):
-    print("Error. File not found: predicted/" +  file_id + ".txt")
-    sys.exit(0)
+    error("Error. File not found: predicted/" +  file_id + ".txt")
   lines_list = file_lines_to_list(txt_file)
   # create ground-truth dictionary
   bounding_boxes = []
@@ -181,6 +205,29 @@ unique_classes = sorted(unique_classes)
 n_classes = len(unique_classes)
 #print(unique_classes)
 #print(counter_per_class)
+
+"""
+ Check format of the flag --set-class-iou (if used)
+"""
+if specific_iou_flagged:
+  n_args = len(args.set_class_iou)
+  error_msg = \
+    '\n --set-class-iou [class_1] [IoU_1] [class_2] [IoU_2] [...]'
+  if n_args % 2 != 0:
+    error('Error, missing arguments. Flag usage:' + error_msg)
+  # [class_1] [IoU_1] [class_2] [IoU_2]
+  # specific_iou_classes = ['class_1', 'class_2']
+  specific_iou_classes = args.set_class_iou[::2] # even
+  # iou_list = ['IoU_1', 'IoU_2']
+  iou_list = args.set_class_iou[1::2] # odd
+  if len(specific_iou_classes) != len(iou_list):
+    error('Error, missing arguments. Flag usage:' + error_msg)
+  for tmp_class in specific_iou_classes:
+    if tmp_class not in unique_classes:
+          error('Error, unknown class \"' + tmp_class + '\". Flag usage:' + error_msg)
+  for num in iou_list:
+    if not is_float_between_0_and_1(num):
+      error('Error, IoU must be between 0.0 and 1.0. Flag usage:' + error_msg)
 
 """
  Plot the total number of occurences of each class in the ground-truth
@@ -264,11 +311,9 @@ for class_index, class_name in enumerate(unique_classes):
       ground_truth_img = glob.glob1(img_path, file_id + ".*")
       #tifCounter = len(glob.glob1(myPath,"*.tif"))
       if len(ground_truth_img) == 0:
-        print("Error. Image not found with id: " + file_id)
-        sys.exit(0)
+        error("Error. Image not found with id: " + file_id)
       elif len(ground_truth_img) > 1:
-        print("Error. Multiple image with id: " + file_id)
-        sys.exit(0)
+        error("Error. Multiple image with id: " + file_id)
       else: # found image
         #print(img_path + "/" + ground_truth_img[0])
         # Load image
@@ -303,8 +348,14 @@ for class_index, class_name in enumerate(unique_classes):
 
     # assign prediction as true positive or false positive
     if show_animation:
-      status = "no match"
-    if ovmax >= MINOVERLAP:
+      status = "no match" # status is only used in the animation
+    # set minimum overlap
+    min_overlap = MINOVERLAP
+    if specific_iou_flagged:
+      if class_name in specific_iou_classes:
+        index = specific_iou_classes.index(class_name)
+        min_overlap = float(iou_list[index])
+    if ovmax >= min_overlap:
       if not bool(gt_match["used"]):
         # true positive
         tp[idx] = 1
