@@ -6,7 +6,7 @@ import operator
 import sys
 import argparse
 
-MINOVERLAP = 0.5 # value defined in the PASCAL VOC2012 challenge
+MINOVERLAP = 0.5 # default value (defined in the PASCAL VOC2012 challenge)
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-na', '--no-animation', help="no animation is shown.", action="store_true")
@@ -175,7 +175,7 @@ counter_per_class = {}
 for txt_file in ground_truth_files_list:
   #print(txt_file)
   file_id = txt_file.split(".txt",1)[0]
-  file_id = file_id.split("/",1)[1]
+  file_id = os.path.basename(os.path.normpath(file_id))
   # check if there is a correspondent predicted objects file
   if not os.path.exists('predicted/' + file_id + ".txt"):
     error("Error. File not found: predicted/" +  file_id + ".txt")
@@ -272,7 +272,7 @@ for class_name in unique_classes:
       if line_class_name == class_name:
         #print("match")
         file_id = txt_file.split(".txt",1)[0]
-        file_id = file_id.split("/",1)[1]
+        file_id = os.path.basename(os.path.normpath(file_id))
         bbox = left + " " + top + " " + right + " " +bottom
         bounding_boxes.append({"confidence":confidence, "file_id":file_id, "bbox":bbox})
         #print(bounding_boxes)
