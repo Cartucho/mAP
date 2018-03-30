@@ -2,7 +2,7 @@ import sys
 import os
 import glob
 import cv2
-import numpy as np
+
 
 # read the class_list.txt to a list
 with open("class_list.txt") as f:
@@ -13,7 +13,7 @@ with open("class_list.txt") as f:
 #print(obj_list[0])
 
 # change directory to the one with the files to be changed
-path_to_folder = '../ground_truth'
+path_to_folder = '../ground-truth'
 #print(path_to_folder)
 os.chdir(path_to_folder)
 
@@ -23,8 +23,12 @@ if not os.path.exists("backup"):
   os.makedirs("backup")
 
 # create VOC format files
-for tmp_file in glob.glob('*.txt'):
-  #print tmp_file
+txt_list = glob.glob('*.txt')
+if len(txt_list) == 0:
+  print("Error: no .txt files found in ground-truth")
+  sys.exit()
+for tmp_file in txt_list:
+  #print(tmp_file)
   # 1. check that there is an image with that name
   ## get name before ".txt"
   image_name = tmp_file.split(".txt",1)[0]
@@ -73,5 +77,3 @@ for tmp_file in glob.glob('*.txt'):
       ## add new line to file
       #print(obj_name + " " + str(left) + " " + str(top) + " " + str(right) + " " + str(bottom))
       new_f.write(obj_name + " " + str(left) + " " + str(top) + " " + str(right) + " " + str(bottom) + '\n')
-
-
