@@ -156,8 +156,8 @@ if os.path.exists(results_files_path): # if it exist already
   # reset the results directory
   shutil.rmtree(results_files_path)
 
+os.makedirs(results_files_path)
 if draw_plot:
-  os.makedirs(results_files_path)
   os.makedirs(results_files_path + "/classes")
 
 
@@ -287,179 +287,184 @@ for class_name in unique_classes:
 sum_AP = 0.0
 # create array of zeros to store all AP's
 ap_array = [0] * n_classes
-for class_index, class_name in enumerate(unique_classes):
-  """
-   Load predictions of that class
-  """
-  predictions_file = tmp_files_path + "/" + class_name + "_predictions.json"
-  predictions_data = json.load(open(predictions_file))
-  if not predictions_data:
-    # no predictions found for that class
-    if not args.quiet:
-      print(class_name + " AP = 0.00%")
-    continue # skip this class
-  """
-   Assign predictions to ground truth objects
-  """
-  nd = len(predictions_data)
-  tp = [0] * nd # creates an array of zeros of size nd
-  fp = [0] * nd
-  for idx, prediction in enumerate(predictions_data):
-    file_id = prediction["file_id"]
-    if show_animation:
-      # find ground truth image
-      ground_truth_img = glob.glob1(img_path, file_id + ".*")
-      #tifCounter = len(glob.glob1(myPath,"*.tif"))
-      if len(ground_truth_img) == 0:
-        error("Error. Image not found with id: " + file_id)
-      elif len(ground_truth_img) > 1:
-        error("Error. Multiple image with id: " + file_id)
-      else: # found image
-        #print(img_path + "/" + ground_truth_img[0])
-        # Load image
-        img = cv2.imread(img_path + "/" + ground_truth_img[0])
-        # Add bottom border to image
-        bottom_border = 30
-        BLACK = [0, 0, 0]
-        img = cv2.copyMakeBorder(img, 0, bottom_border, 0, 0, cv2.BORDER_CONSTANT, value=BLACK)
-    # assign prediction to ground truth object if any
-    #   open ground-truth with that file_id
-    gt_file = tmp_files_path + "/" + file_id + "_ground_truth.json"
-    ground_truth_data = json.load(open(gt_file))
-    ovmax = -1
-    gt_match = -1
-    # load prediction bounding-box
-    bb = [ float(x) for x in prediction["bbox"].split() ]
-    for obj in ground_truth_data:
-      # look for a class_name match
-      if obj["class_name"] == class_name:
-        bbgt = [ float(x) for x in obj["bbox"].split() ]
-        bi = [max(bb[0],bbgt[0]), max(bb[1],bbgt[1]), min(bb[2],bbgt[2]), min(bb[3],bbgt[3])]
-        iw = bi[2] - bi[0] + 1
-        ih = bi[3] - bi[1] + 1
-        if iw > 0 and ih > 0:
-          # compute overlap = area of intersection / area of union
-          ua = (bb[2] - bb[0] + 1) * (bb[3] - bb[1] + 1) + (bbgt[2] - bbgt[0]
-                  + 1) * (bbgt[3] - bbgt[1] + 1) - iw * ih
-          ov = iw * ih / ua
-          if ov > ovmax:
-            ovmax = ov
-            gt_match = obj
+# open file to store the results
+with open(results_files_path + "/results.txt", 'w') as results_file:
+  for class_index, class_name in enumerate(unique_classes):
+    """
+     Load predictions of that class
+    """
+    predictions_file = tmp_files_path + "/" + class_name + "_predictions.json"
+    predictions_data = json.load(open(predictions_file))
+    if not predictions_data:
+      # no predictions found for that class
+      if not args.quiet:
+        print(class_name + " AP = 0.00%")
+        results_file.write(class_name + " AP = 0.00%\n")
+      continue # skip this class
+    """
+     Assign predictions to ground truth objects
+    """
+    nd = len(predictions_data)
+    tp = [0] * nd # creates an array of zeros of size nd
+    fp = [0] * nd
+    for idx, prediction in enumerate(predictions_data):
+      file_id = prediction["file_id"]
+      if show_animation:
+        # find ground truth image
+        ground_truth_img = glob.glob1(img_path, file_id + ".*")
+        #tifCounter = len(glob.glob1(myPath,"*.tif"))
+        if len(ground_truth_img) == 0:
+          error("Error. Image not found with id: " + file_id)
+        elif len(ground_truth_img) > 1:
+          error("Error. Multiple image with id: " + file_id)
+        else: # found image
+          #print(img_path + "/" + ground_truth_img[0])
+          # Load image
+          img = cv2.imread(img_path + "/" + ground_truth_img[0])
+          # Add bottom border to image
+          bottom_border = 30
+          BLACK = [0, 0, 0]
+          img = cv2.copyMakeBorder(img, 0, bottom_border, 0, 0, cv2.BORDER_CONSTANT, value=BLACK)
+      # assign prediction to ground truth object if any
+      #   open ground-truth with that file_id
+      gt_file = tmp_files_path + "/" + file_id + "_ground_truth.json"
+      ground_truth_data = json.load(open(gt_file))
+      ovmax = -1
+      gt_match = -1
+      # load prediction bounding-box
+      bb = [ float(x) for x in prediction["bbox"].split() ]
+      for obj in ground_truth_data:
+        # look for a class_name match
+        if obj["class_name"] == class_name:
+          bbgt = [ float(x) for x in obj["bbox"].split() ]
+          bi = [max(bb[0],bbgt[0]), max(bb[1],bbgt[1]), min(bb[2],bbgt[2]), min(bb[3],bbgt[3])]
+          iw = bi[2] - bi[0] + 1
+          ih = bi[3] - bi[1] + 1
+          if iw > 0 and ih > 0:
+            # compute overlap = area of intersection / area of union
+            ua = (bb[2] - bb[0] + 1) * (bb[3] - bb[1] + 1) + (bbgt[2] - bbgt[0]
+                    + 1) * (bbgt[3] - bbgt[1] + 1) - iw * ih
+            ov = iw * ih / ua
+            if ov > ovmax:
+              ovmax = ov
+              gt_match = obj
 
-    # assign prediction as true positive or false positive
-    if show_animation:
-      status = "no match" # status is only used in the animation
-    # set minimum overlap
-    min_overlap = MINOVERLAP
-    if specific_iou_flagged:
-      if class_name in specific_iou_classes:
-        index = specific_iou_classes.index(class_name)
-        min_overlap = float(iou_list[index])
-    if ovmax >= min_overlap:
-      if not bool(gt_match["used"]):
-        # true positive
-        tp[idx] = 1
-        gt_match["used"] = True
-        # update the ".json" file
-        with open(gt_file, 'w') as f:
-            f.write(json.dumps(ground_truth_data))
-        if show_animation:
-          status = "match"
+      # assign prediction as true positive or false positive
+      if show_animation:
+        status = "no match" # status is only used in the animation
+      # set minimum overlap
+      min_overlap = MINOVERLAP
+      if specific_iou_flagged:
+        if class_name in specific_iou_classes:
+          index = specific_iou_classes.index(class_name)
+          min_overlap = float(iou_list[index])
+      if ovmax >= min_overlap:
+        if not bool(gt_match["used"]):
+          # true positive
+          tp[idx] = 1
+          gt_match["used"] = True
+          # update the ".json" file
+          with open(gt_file, 'w') as f:
+              f.write(json.dumps(ground_truth_data))
+          if show_animation:
+            status = "match"
+        else:
+          # false positive (multiple detection)
+          fp[idx] = 1
+          if show_animation:
+            status = "repeated match"
       else:
-        # false positive (multiple detection)
+        # false positive
         fp[idx] = 1
-        if show_animation:
-          status = "repeated match"
-    else:
-      # false positive
-      fp[idx] = 1
-      if ovmax > 0:
-        status = "poor overlap"
+        if ovmax > 0:
+          status = "poor overlap"
 
-    if show_animation:
-      #text_status = " Status: " + status
+      if show_animation:
+        #text_status = " Status: " + status
 
-      height, widht = img.shape[:2]
-      margin = 10
-      text = "Image: " + ground_truth_img[0] + " "
-      img, total_text_width = draw_text_in_image(img, text, (10, height - margin), (255,255,255), 0)
-      text = "Class [" + str(class_index) + "/" + str(n_classes) + "]: " + class_name + " "
-      img, total_text_width = draw_text_in_image(img, text, (10 + total_text_width, height - margin), (255,200,100), total_text_width)
-      text = "Status: " + status + " "
-      if status == "match":
-        img, total_text_width = draw_text_in_image(img, text, (10 + total_text_width, height - margin), (0,255,0), total_text_width)
-      else:
-        img, total_text_width = draw_text_in_image(img, text, (10 + total_text_width, height - margin), (0,0,255), total_text_width)
+        height, widht = img.shape[:2]
+        margin = 10
+        text = "Image: " + ground_truth_img[0] + " "
+        img, total_text_width = draw_text_in_image(img, text, (10, height - margin), (255,255,255), 0)
+        text = "Class [" + str(class_index) + "/" + str(n_classes) + "]: " + class_name + " "
+        img, total_text_width = draw_text_in_image(img, text, (10 + total_text_width, height - margin), (255,200,100), total_text_width)
+        text = "Status: " + status + " "
+        if status == "match":
+          img, total_text_width = draw_text_in_image(img, text, (10 + total_text_width, height - margin), (0,255,0), total_text_width)
+        else:
+          img, total_text_width = draw_text_in_image(img, text, (10 + total_text_width, height - margin), (0,0,255), total_text_width)
 
-      if ovmax > 0: # if there is intersections between the bounding-boxes
-        bbgt = [ float(x) for x in gt_match["bbox"].split() ]
-        cv2.rectangle(img,(int(bbgt[0]),int(bbgt[1])),(int(bbgt[2]),int(bbgt[3])),(255,200,100),2)
-      if status == "match":
-        cv2.rectangle(img,(int(bb[0]),int(bb[1])),(int(bb[2]),int(bb[3])),(0,255,0),2)
-      else:
-        cv2.rectangle(img,(int(bb[0]),int(bb[1])),(int(bb[2]),int(bb[3])),(0,0,255),2)
-      cv2.imshow("Animation", img)
-      cv2.waitKey(20)
+        if ovmax > 0: # if there is intersections between the bounding-boxes
+          bbgt = [ float(x) for x in gt_match["bbox"].split() ]
+          cv2.rectangle(img,(int(bbgt[0]),int(bbgt[1])),(int(bbgt[2]),int(bbgt[3])),(255,200,100),2)
+        if status == "match":
+          cv2.rectangle(img,(int(bb[0]),int(bb[1])),(int(bb[2]),int(bb[3])),(0,255,0),2)
+        else:
+          cv2.rectangle(img,(int(bb[0]),int(bb[1])),(int(bb[2]),int(bb[3])),(0,0,255),2)
+        cv2.imshow("Animation", img)
+        cv2.waitKey(20)
 
-  #print(tp)
-  # compute precision/recall
-  cumsum = 0
-  for idx, val in enumerate(fp):
-    fp[idx] += cumsum
-    cumsum += val
-  cumsum = 0
-  for idx, val in enumerate(tp):
-    tp[idx] += cumsum
-    cumsum += val
-  #print(tp)
-  rec = tp[:]
-  for idx, val in enumerate(tp):
-    rec[idx] = float(tp[idx]) / counter_per_class[class_name]
-  #print(rec)
-  prec = tp[:]
-  for idx, val in enumerate(tp):
-    prec[idx] = float(tp[idx]) / (fp[idx] + tp[idx])
-  #print(prec)
+    #print(tp)
+    # compute precision/recall
+    cumsum = 0
+    for idx, val in enumerate(fp):
+      fp[idx] += cumsum
+      cumsum += val
+    cumsum = 0
+    for idx, val in enumerate(tp):
+      tp[idx] += cumsum
+      cumsum += val
+    #print(tp)
+    rec = tp[:]
+    for idx, val in enumerate(tp):
+      rec[idx] = float(tp[idx]) / counter_per_class[class_name]
+    #print(rec)
+    prec = tp[:]
+    for idx, val in enumerate(tp):
+      prec[idx] = float(tp[idx]) / (fp[idx] + tp[idx])
+    #print(prec)
 
-  ap, mrec, mprec = voc_ap(rec, prec)
-  sum_AP += ap
-  if not args.quiet:
-    print(class_name + " AP = {0:.2f}%".format(ap*100))
-  ap_array[class_index] = ap
+    ap, mrec, mprec = voc_ap(rec, prec)
+    sum_AP += ap
+    if not args.quiet:
+      print(class_name + " AP = {0:.2f}%".format(ap*100))
+      results_file.write(class_name + " AP = {0:.2f}%\n".format(ap*100))
+    ap_array[class_index] = ap
 
-  """
-   Draw plot
-  """
-  if draw_plot:
-    plt.plot(rec, prec, '-o')
-    #plt.plot(mrec, mprec, '-')
-    plt.fill_between(mrec, 0, mprec, alpha=0.2, edgecolor='r')
-    #plt.fill(mprec, 0, 'b', alpha=0.2, edgecolor='r')
-    # set window title
-    fig = plt.gcf() # gcf - get current figure
-    fig.canvas.set_window_title('AP ' + class_name)
-    # set plot title
-    plt.title('class: ' + class_name + ", AP = {0:.2f}%".format(ap*100))
-    #plt.suptitle('This is a somewhat long figure title', fontsize=16)
-    # set axis titles
-    plt.xlabel('Recall')
-    plt.ylabel('Precision')
-    # optional - set axes
-    axes = plt.gca() # gca - get current axes
-    axes.set_xlim([0.0,1.0])
-    axes.set_ylim([0.0,1.05]) # .05 to give some extra space
-    # wait for button to be pressed
-    #plt.show() # normal display
-    #while not plt.waitforbuttonpress(): pass # wait for key display
-    # save the plot
-    fig.savefig(results_files_path + "/classes/" + class_name + ".jpg")
-    plt.cla() # clear axes for next plot
+    """
+     Draw plot
+    """
+    if draw_plot:
+      plt.plot(rec, prec, '-o')
+      #plt.plot(mrec, mprec, '-')
+      plt.fill_between(mrec, 0, mprec, alpha=0.2, edgecolor='r')
+      #plt.fill(mprec, 0, 'b', alpha=0.2, edgecolor='r')
+      # set window title
+      fig = plt.gcf() # gcf - get current figure
+      fig.canvas.set_window_title('AP ' + class_name)
+      # set plot title
+      plt.title('class: ' + class_name + ", AP = {0:.2f}%".format(ap*100))
+      #plt.suptitle('This is a somewhat long figure title', fontsize=16)
+      # set axis titles
+      plt.xlabel('Recall')
+      plt.ylabel('Precision')
+      # optional - set axes
+      axes = plt.gca() # gca - get current axes
+      axes.set_xlim([0.0,1.0])
+      axes.set_ylim([0.0,1.05]) # .05 to give some extra space
+      # wait for button to be pressed
+      #plt.show() # normal display
+      #while not plt.waitforbuttonpress(): pass # wait for key display
+      # save the plot
+      fig.savefig(results_files_path + "/classes/" + class_name + ".jpg")
+      plt.cla() # clear axes for next plot
 
-if show_animation:
-  cv2.destroyAllWindows()
+  if show_animation:
+    cv2.destroyAllWindows()
 
-mAP = sum_AP / n_classes
-print("mAP = {0:.2f}%".format(mAP*100))
+  mAP = sum_AP / n_classes
+  print("mAP = {0:.2f}%".format(mAP*100))
+  results_file.write("mAP = {0:.2f}%\n".format(mAP*100))
 
 """
  Draw mAP plot (Show AP's of all classes in decreasing order)
