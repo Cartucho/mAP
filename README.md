@@ -85,6 +85,10 @@ Optional (if you want to see the **animation**):
   6. Insert the images into the folder **images/**
 
 
+#### Darkflow and YOLO users
+
+In the `extra` folder you can find additional scripts to convert between **darkflow** and **Yolo** into the required format.
+
 #### Create the ground-truth files
 
 - Create a separate ground-truth text file for each image.
