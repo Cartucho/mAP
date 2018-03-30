@@ -50,7 +50,6 @@ draw_plot = False
 if not args.no_plot:
   try:
     import matplotlib.pyplot as plt
-    import numpy as np
     draw_plot = True
   except ImportError:
     args.no_plot = True
@@ -159,7 +158,8 @@ if os.path.exists(results_files_path): # if it exist already
 os.makedirs(results_files_path)
 if draw_plot:
   os.makedirs(results_files_path + "/classes")
-
+if show_animation:
+  os.makedirs(results_files_path + "/images")
 
 """
  Ground-Truth
@@ -171,6 +171,7 @@ ground_truth_files_list = glob.glob('ground-truth/*.txt')
 ground_truth_files_list.sort()
 
 unique_classes = set([])
+# dictionary with counter per class
 counter_per_class = {}
 for txt_file in ground_truth_files_list:
   #print(txt_file)
@@ -285,8 +286,7 @@ for class_name in unique_classes:
  Calculate the AP for each class
 """
 sum_AP = 0.0
-# create array of zeros to store all AP's
-ap_array = [0] * n_classes
+ap_dictionary = {}
 # open file to store the results
 with open(results_files_path + "/results.txt", 'w') as results_file:
   for class_index, class_name in enumerate(unique_classes):
@@ -300,6 +300,7 @@ with open(results_files_path + "/results.txt", 'w') as results_file:
       if not args.quiet:
         print(class_name + " AP = 0.00%")
         results_file.write(class_name + " AP = 0.00%\n")
+      ap_dictionary[class_name] = 0.0
       continue # skip this class
     """
      Assign predictions to ground truth objects
@@ -402,7 +403,10 @@ with open(results_files_path + "/results.txt", 'w') as results_file:
         else:
           cv2.rectangle(img,(int(bb[0]),int(bb[1])),(int(bb[2]),int(bb[3])),(0,0,255),2)
         cv2.imshow("Animation", img)
-        cv2.waitKey(20)
+        cv2.waitKey(20) # show image for 20 ms
+        # save image to results
+        output_img_path = results_files_path + "/images/" + class_name + "_prediction" + str(idx) + ".jpg"
+        cv2.imwrite(output_img_path, img)
 
     #print(tp)
     # compute precision/recall
@@ -429,16 +433,14 @@ with open(results_files_path + "/results.txt", 'w') as results_file:
     if not args.quiet:
       print(class_name + " AP = {0:.2f}%".format(ap*100))
       results_file.write(class_name + " AP = {0:.2f}%\n".format(ap*100))
-    ap_array[class_index] = ap
+    ap_dictionary[class_name] = ap
 
     """
      Draw plot
     """
     if draw_plot:
       plt.plot(rec, prec, '-o')
-      #plt.plot(mrec, mprec, '-')
       plt.fill_between(mrec, 0, mprec, alpha=0.2, edgecolor='r')
-      #plt.fill(mprec, 0, 'b', alpha=0.2, edgecolor='r')
       # set window title
       fig = plt.gcf() # gcf - get current figure
       fig.canvas.set_window_title('AP ' + class_name)
@@ -470,15 +472,12 @@ with open(results_files_path + "/results.txt", 'w') as results_file:
  Draw mAP plot (Show AP's of all classes in decreasing order)
 """
 if draw_plot:
-    # sort classes and AP by decreasing value
-    unique_classes = np.array(unique_classes)
-    ap_array = np.array(ap_array)
-    inds = ap_array.argsort()[::-1]
-    sorted_ap_array = ap_array[inds]
-    sorted_unique_classes = unique_classes[inds]
-    # draw histogram
-    plt.bar(np.arange(n_classes), sorted_ap_array, tick_label=sorted_unique_classes)
-    plt.xticks(xrange(n_classes), rotation='vertical')
+    # sort the classes dictionary by decreasing AP value into a list of tuples
+    sorted_ap_per_class = sorted(ap_dictionary.items(), key=operator.itemgetter(1), reverse=True)
+    # unpacking the list of tuples into two lists
+    sorted_keys, sorted_values = zip(*sorted_ap_per_class)
+    plt.bar(range(n_classes), sorted_values, align='center')
+    plt.xticks(range(n_classes), sorted_keys, rotation='vertical')
     # set window title
     fig = plt.gcf() # gcf - get current figure
     fig.canvas.set_window_title('mAP')
