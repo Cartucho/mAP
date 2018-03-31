@@ -145,6 +145,33 @@ def draw_text_in_image(img, text, pos, color, line_width):
 
 
 """
+ Draw plot using Matplotlib
+"""
+def draw_plot_func(dictionary, n_classes, window_title, plot_title, y_label, output_path, to_show):
+    # sort the dictionary by decreasing value (reverse=True), into a list of tuples
+    sorted_dic_by_value = sorted(dictionary.items(), key=operator.itemgetter(1), reverse=True)
+    # unpacking the list of tuples into two lists
+    sorted_keys, sorted_values = zip(*sorted_dic_by_value)
+    plt.bar(range(n_classes), sorted_values, align='center')
+    plt.xticks(range(n_classes), sorted_keys, rotation='vertical')
+    # set window title
+    fig = plt.gcf() # gcf - get current figure
+    fig.canvas.set_window_title(window_title)
+    # set plot title
+    plt.title(plot_title)
+    # set axis titles
+    # plt.xlabel('classes')
+    plt.ylabel(y_label)
+    # adjust size of window
+    fig.tight_layout()
+    if to_show:
+      plt.show()
+    # save the plot
+    fig.savefig(output_path)
+    # clear the plot
+    plt.clf()
+
+"""
  Create a "tmp_files/" and "results/" directory
 """
 tmp_files_path = "tmp_files"
@@ -169,10 +196,11 @@ if show_animation:
 # get a list with the ground-truth files
 ground_truth_files_list = glob.glob('ground-truth/*.txt')
 ground_truth_files_list.sort()
+gt_counter_per_class = {}
 
 unique_classes = set([])
 # dictionary with counter per class
-counter_per_class = {}
+
 for txt_file in ground_truth_files_list:
   #print(txt_file)
   file_id = txt_file.split(".txt",1)[0]
@@ -191,11 +219,11 @@ for txt_file in ground_truth_files_list:
     bbox = left + " " + top + " " + right + " " +bottom
     bounding_boxes.append({"class_name":class_name, "bbox":bbox, "used":False})
     # count that object
-    if class_name in counter_per_class:
-      counter_per_class[class_name] += 1
+    if class_name in gt_counter_per_class:
+      gt_counter_per_class[class_name] += 1
     else:
       # if class didn't exist yet
-      counter_per_class[class_name] = 1
+      gt_counter_per_class[class_name] = 1
       unique_classes.add(class_name)
   # dump bounding_boxes into a ".json" file
   with open(tmp_files_path + "/" + file_id + "_ground_truth.json", 'w') as outfile:
@@ -205,7 +233,7 @@ for txt_file in ground_truth_files_list:
 unique_classes = sorted(unique_classes)
 n_classes = len(unique_classes)
 #print(unique_classes)
-#print(counter_per_class)
+#print(gt_counter_per_class)
 
 """
  Check format of the flag --set-class-iou (if used)
@@ -234,27 +262,13 @@ if specific_iou_flagged:
  Plot the total number of occurences of each class in the ground-truth
 """
 if draw_plot:
-    # sort the counter_per_class dictionary by value into a list of tuples
-    sorted_counter_per_class = sorted(counter_per_class.items(), key=operator.itemgetter(1), reverse=True)
-    # unpacking the list of tuples into two lists
-    sorted_keys, sorted_values = zip(*sorted_counter_per_class)
-    plt.bar(range(n_classes), sorted_values, align='center')
-    plt.xticks(range(n_classes), sorted_keys, rotation='vertical')
-    # set window title
-    fig = plt.gcf() # gcf - get current figure
-    fig.canvas.set_window_title('Ground-Truth Info')
-    # set plot title
-    plt.title("Total of ground-truth files = " + str(len(ground_truth_files_list)))
-    # set axis titles
-    #plt.xlabel('classes')
-    plt.ylabel('Number of objects per class')
-    # adjust size of window
-    fig.tight_layout()
-    #plt.show()
-    # save the plot
-    fig.savefig(results_files_path + "/Ground-Truth Info.jpg")
-    # clear the plot
-    plt.clf()
+  window_title = "Ground-Truth Info"
+  plot_title = "Total of ground-truth files = " + str(len(ground_truth_files_list))
+  y_label = "Number of objects per class"
+  output_path = results_files_path + "/Ground-Truth Info.jpg"
+  to_show = False
+  draw_plot_func(gt_counter_per_class, n_classes, window_title, plot_title, y_label, output_path, to_show)
+
 """
  Predicted
    Load each of the predicted files into a temporary ".json" file.
@@ -262,9 +276,11 @@ if draw_plot:
 # get a list with the predicted files
 predicted_files_list = glob.glob('predicted/*.txt')
 predicted_files_list.sort()
+pred_counter_per_class = {}
 
 for class_name in unique_classes:
   bounding_boxes = []
+  pred_counter_per_class[class_name] = 0
   for txt_file in predicted_files_list:
     #print txt_file
     lines = file_lines_to_list(txt_file)
@@ -277,10 +293,27 @@ for class_name in unique_classes:
         bbox = left + " " + top + " " + right + " " +bottom
         bounding_boxes.append({"confidence":confidence, "file_id":file_id, "bbox":bbox})
         #print(bounding_boxes)
+        # count that object
+        if class_name in pred_counter_per_class:
+          pred_counter_per_class[class_name] += 1
+        else:
+          # if class didn't exist yet
+          pred_counter_per_class[class_name] = 1
   # sort predictions by decreasing confidence
   bounding_boxes.sort(key=lambda x:x['confidence'], reverse=True)
   with open(tmp_files_path + "/" + class_name + "_predictions.json", 'w') as outfile:
     json.dump(bounding_boxes, outfile)
+
+"""
+ Plot the total number of occurences of each class in the "predicted" folder
+"""
+if draw_plot:
+  window_title = "Predictions Info"
+  plot_title = "Total of Predicted files = " + str(len(predicted_files_list))
+  y_label = "Number of objects per class"
+  output_path = results_files_path + "/Predictions Info.jpg"
+  to_show = False
+  draw_plot_func(pred_counter_per_class, n_classes, window_title, plot_title, y_label, output_path, to_show)
 
 """
  Calculate the AP for each class
@@ -342,7 +375,7 @@ with open(results_files_path + "/results.txt", 'w') as results_file:
           iw = bi[2] - bi[0] + 1
           ih = bi[3] - bi[1] + 1
           if iw > 0 and ih > 0:
-            # compute overlap = area of intersection / area of union
+            # compute overlap (IoU) = area of intersection / area of union
             ua = (bb[2] - bb[0] + 1) * (bb[3] - bb[1] + 1) + (bbgt[2] - bbgt[0]
                     + 1) * (bbgt[3] - bbgt[1] + 1) - iw * ih
             ov = iw * ih / ua
@@ -380,6 +413,9 @@ with open(results_files_path + "/results.txt", 'w') as results_file:
         if ovmax > 0:
           status = "INSUFFICIENT OVERLAP"
 
+      """
+       Draw image to show animation
+      """
       if show_animation:
         height, widht = img.shape[:2]
         # colors (OpenCV works with BGR)
@@ -438,7 +474,7 @@ with open(results_files_path + "/results.txt", 'w') as results_file:
     #print(tp)
     rec = tp[:]
     for idx, val in enumerate(tp):
-      rec[idx] = float(tp[idx]) / counter_per_class[class_name]
+      rec[idx] = float(tp[idx]) / gt_counter_per_class[class_name]
     #print(rec)
     prec = tp[:]
     for idx, val in enumerate(tp):
@@ -471,9 +507,10 @@ with open(results_files_path + "/results.txt", 'w') as results_file:
       axes = plt.gca() # gca - get current axes
       axes.set_xlim([0.0,1.0])
       axes.set_ylim([0.0,1.05]) # .05 to give some extra space
-      # wait for button to be pressed
-      #plt.show() # normal display
+      # Alternative option -> wait for button to be pressed
       #while not plt.waitforbuttonpress(): pass # wait for key display
+      # Alternative option -> normal display
+      #plt.show()
       # save the plot
       fig.savefig(results_files_path + "/classes/" + class_name + ".jpg")
       plt.cla() # clear axes for next plot
@@ -489,24 +526,12 @@ with open(results_files_path + "/results.txt", 'w') as results_file:
  Draw mAP plot (Show AP's of all classes in decreasing order)
 """
 if draw_plot:
-    # sort the classes dictionary by decreasing AP value into a list of tuples
-    sorted_ap_per_class = sorted(ap_dictionary.items(), key=operator.itemgetter(1), reverse=True)
-    # unpacking the list of tuples into two lists
-    sorted_keys, sorted_values = zip(*sorted_ap_per_class)
-    plt.bar(range(n_classes), sorted_values, align='center')
-    plt.xticks(range(n_classes), sorted_keys, rotation='vertical')
-    # set window title
-    fig = plt.gcf() # gcf - get current figure
-    fig.canvas.set_window_title('mAP')
-    # set plot title
-    plt.title("mAP = {0:.2f}%".format(mAP*100))
-    # set axis titles
-    #plt.xlabel('classes')
-    plt.ylabel('Average Precision')
-    # adjust size of window
-    fig.tight_layout()
-    fig.savefig(results_files_path + "/mAP.jpg")
-    plt.show()
+  window_title = "mAP"
+  plot_title = "mAP = {0:.2f}%".format(mAP*100)
+  y_label = "Average Precision"
+  output_path = results_files_path + "/mAP.jpg"
+  to_show = True
+  draw_plot_func(ap_dictionary, n_classes, window_title, plot_title, y_label, output_path, to_show)
 
 # remove the tmp_files directory
 shutil.rmtree(tmp_files_path)
