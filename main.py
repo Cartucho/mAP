@@ -129,7 +129,7 @@ def file_lines_to_list(path):
 """
  Draws text in image
 """
-def draw_text_in_image(img, text, pos, color, total_text_width):
+def draw_text_in_image(img, text, pos, color, line_width):
   font = cv2.FONT_HERSHEY_PLAIN
   fontScale = 1
   lineType = 1
@@ -141,7 +141,7 @@ def draw_text_in_image(img, text, pos, color, total_text_width):
       color,
       lineType)
   text_width, _ = cv2.getTextSize(text, font, fontScale, lineType)[0]
-  return img, (total_text_width + text_width)
+  return img, (line_width + text_width)
 
 
 """
@@ -323,7 +323,7 @@ with open(results_files_path + "/results.txt", 'w') as results_file:
           # Load image
           img = cv2.imread(img_path + "/" + ground_truth_img[0])
           # Add bottom border to image
-          bottom_border = 30
+          bottom_border = 60
           BLACK = [0, 0, 0]
           img = cv2.copyMakeBorder(img, 0, bottom_border, 0, 0, cv2.BORDER_CONSTANT, value=BLACK)
       # assign prediction to ground truth object if any
@@ -352,7 +352,7 @@ with open(results_files_path + "/results.txt", 'w') as results_file:
 
       # assign prediction as true positive or false positive
       if show_animation:
-        status = "no match" # status is only used in the animation
+        status = "NO MATCH FOUND!" # status is only used in the animation
       # set minimum overlap
       min_overlap = MINOVERLAP
       if specific_iou_flagged:
@@ -368,40 +368,57 @@ with open(results_files_path + "/results.txt", 'w') as results_file:
           with open(gt_file, 'w') as f:
               f.write(json.dumps(ground_truth_data))
           if show_animation:
-            status = "match"
+            status = "MATCH!"
         else:
           # false positive (multiple detection)
           fp[idx] = 1
           if show_animation:
-            status = "repeated match"
+            status = "REPEATED MATCH!"
       else:
         # false positive
         fp[idx] = 1
         if ovmax > 0:
-          status = "poor overlap"
+          status = "INSUFFICIENT OVERLAP"
 
       if show_animation:
-        #text_status = " Status: " + status
-
         height, widht = img.shape[:2]
+        # colors (OpenCV works with BGR)
+        white = (255,255,255)
+        light_blue = (255,200,100)
+        green = (0,255,0)
+        light_red = (30,30,255)
+        # 1st line
         margin = 10
+        v_pos = height - margin - (bottom_border / 2)
         text = "Image: " + ground_truth_img[0] + " "
-        img, total_text_width = draw_text_in_image(img, text, (10, height - margin), (255,255,255), 0)
+        img, line_width = draw_text_in_image(img, text, (margin, v_pos), white, 0)
         text = "Class [" + str(class_index) + "/" + str(n_classes) + "]: " + class_name + " "
-        img, total_text_width = draw_text_in_image(img, text, (10 + total_text_width, height - margin), (255,200,100), total_text_width)
-        text = "Status: " + status + " "
-        if status == "match":
-          img, total_text_width = draw_text_in_image(img, text, (10 + total_text_width, height - margin), (0,255,0), total_text_width)
-        else:
-          img, total_text_width = draw_text_in_image(img, text, (10 + total_text_width, height - margin), (0,0,255), total_text_width)
+        img, line_width = draw_text_in_image(img, text, (margin + line_width, v_pos), light_blue, line_width)
+        if ovmax != -1:
+          color = light_red
+          if status == "INSUFFICIENT OVERLAP":
+            text = "IoU: {0:.2f}% ".format(ovmax*100) + "< {0:.2f}% ".format(min_overlap*100)
+          else:
+            text = "IoU: {0:.2f}% ".format(ovmax*100) + ">= {0:.2f}% ".format(min_overlap*100)
+            color = green
+          img, _ = draw_text_in_image(img, text, (margin + line_width, v_pos), color, line_width)
+        # 2nd line
+        v_pos += (bottom_border / 2)
+        text = "Prediction confidence: {0:.2f}% ".format(float(prediction["confidence"])*100)
+        img, line_width = draw_text_in_image(img, text, (margin, v_pos), white, 0)
+        color = light_red
+        if status == "MATCH!":
+          color = green
+        text = "Result: " + status + " "
+        img, line_width = draw_text_in_image(img, text, (margin + line_width, v_pos), color, line_width)
 
         if ovmax > 0: # if there is intersections between the bounding-boxes
           bbgt = [ float(x) for x in gt_match["bbox"].split() ]
-          cv2.rectangle(img,(int(bbgt[0]),int(bbgt[1])),(int(bbgt[2]),int(bbgt[3])),(255,200,100),2)
-        if status == "match":
-          cv2.rectangle(img,(int(bb[0]),int(bb[1])),(int(bb[2]),int(bb[3])),(0,255,0),2)
+          cv2.rectangle(img,(int(bbgt[0]),int(bbgt[1])),(int(bbgt[2]),int(bbgt[3])),light_blue,2)
+        if status == "MATCH!":
+          cv2.rectangle(img,(int(bb[0]),int(bb[1])),(int(bb[2]),int(bb[3])),green,2)
         else:
-          cv2.rectangle(img,(int(bb[0]),int(bb[1])),(int(bb[2]),int(bb[3])),(0,0,255),2)
+          cv2.rectangle(img,(int(bb[0]),int(bb[1])),(int(bb[2]),int(bb[3])),light_red,2)
         cv2.imshow("Animation", img)
         cv2.waitKey(20) # show image for 20 ms
         # save image to results
