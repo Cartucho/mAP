@@ -425,7 +425,7 @@ with open(results_files_path + "/results.txt", 'w') as results_file:
         light_red = (30,30,255)
         # 1st line
         margin = 10
-        v_pos = height - margin - (bottom_border / 2)
+        v_pos = int(height - margin - (bottom_border / 2))
         text = "Image: " + ground_truth_img[0] + " "
         img, line_width = draw_text_in_image(img, text, (margin, v_pos), white, 0)
         text = "Class [" + str(class_index) + "/" + str(n_classes) + "]: " + class_name + " "
@@ -439,7 +439,7 @@ with open(results_files_path + "/results.txt", 'w') as results_file:
             color = green
           img, _ = draw_text_in_image(img, text, (margin + line_width, v_pos), color, line_width)
         # 2nd line
-        v_pos += (bottom_border / 2)
+        v_pos += int(bottom_border / 2)
         text = "Prediction confidence: {0:.2f}% ".format(float(prediction["confidence"])*100)
         img, line_width = draw_text_in_image(img, text, (margin, v_pos), white, 0)
         color = light_red
