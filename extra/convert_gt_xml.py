@@ -9,7 +9,7 @@ path_to_folder = '../ground-truth'
 #print(path_to_folder)
 os.chdir(path_to_folder)
 
-# old files (darkflow xml format) will be moved to a "backup" folder
+# old files (xml format) will be moved to a "backup" folder
 ## create the backup dir if it doesn't exist already
 if not os.path.exists("backup"):
   os.makedirs("backup")
@@ -32,5 +32,5 @@ for tmp_file in xml_list:
       right = bndbox.find('xmax').text
       bottom = bndbox.find('ymax').text
       new_f.write(obj_name + " " + left + " " + top + " " + right + " " + bottom + '\n')
-  # 2. move old file (darkflow format) to backup
+  # 2. move old file (xml format) to backup
   os.rename(tmp_file, "backup/" + tmp_file)
