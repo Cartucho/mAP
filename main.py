@@ -62,7 +62,7 @@ def error(msg):
   sys.exit(0)
 
 """
- check if the number is a float
+ check if the number is a float between 0.0 and 1.0
 """
 def is_float_between_0_and_1(value):
   try:
@@ -237,6 +237,7 @@ n_classes = len(unique_classes)
 
 """
  Check format of the flag --set-class-iou (if used)
+  e.g. check if class exists
 """
 if specific_iou_flagged:
   n_args = len(args.set_class_iou)
@@ -268,6 +269,14 @@ if draw_plot:
   output_path = results_files_path + "/Ground-Truth Info.jpg"
   to_show = False
   draw_plot_func(gt_counter_per_class, n_classes, window_title, plot_title, y_label, output_path, to_show)
+
+"""
+ Write number of ground-truth objects per class to results.txt
+"""
+with open(results_files_path + "/results.txt", 'w') as results_file:
+  results_file.write("# Number of ground-truth objects per class\n")
+  for class_name in sorted(gt_counter_per_class):
+    results_file.write(class_name + ": " + str(gt_counter_per_class[class_name]) + "\n")
 
 """
  Predicted
@@ -308,12 +317,20 @@ for class_name in unique_classes:
  Plot the total number of occurences of each class in the "predicted" folder
 """
 if draw_plot:
-  window_title = "Predictions Info"
-  plot_title = "Total of Predicted files = " + str(len(predicted_files_list))
+  window_title = "Predicted Objects Info"
+  plot_title = "Total of Predicted Objects files = " + str(len(predicted_files_list))
   y_label = "Number of objects per class"
-  output_path = results_files_path + "/Predictions Info.jpg"
+  output_path = results_files_path + "/Predicted Objects Info.jpg"
   to_show = False
   draw_plot_func(pred_counter_per_class, n_classes, window_title, plot_title, y_label, output_path, to_show)
+
+"""
+ Write number of predicted objects per class to results.txt
+"""
+with open(results_files_path + "/results.txt", 'a') as results_file:
+  results_file.write("\n# Number of predicted objects per class\n")
+  for class_name in sorted(pred_counter_per_class):
+    results_file.write(class_name + ": " + str(pred_counter_per_class[class_name]) + "\n")
 
 """
  Calculate the AP for each class
@@ -321,20 +338,15 @@ if draw_plot:
 sum_AP = 0.0
 ap_dictionary = {}
 # open file to store the results
-with open(results_files_path + "/results.txt", 'w') as results_file:
+with open(results_files_path + "/results.txt", 'a') as results_file:
+  results_file.write("\n# AP and precision/recall per class\n")
   for class_index, class_name in enumerate(unique_classes):
     """
      Load predictions of that class
     """
     predictions_file = tmp_files_path + "/" + class_name + "_predictions.json"
     predictions_data = json.load(open(predictions_file))
-    if not predictions_data:
-      # no predictions found for that class
-      if not args.quiet:
-        print(class_name + " AP = 0.00%")
-        results_file.write(class_name + " AP = 0.00%\n")
-      ap_dictionary[class_name] = 0.0
-      continue # skip this class
+
     """
      Assign predictions to ground truth objects
     """
@@ -483,9 +495,15 @@ with open(results_files_path + "/results.txt", 'w') as results_file:
 
     ap, mrec, mprec = voc_ap(rec, prec)
     sum_AP += ap
+    text = class_name + " AP = {0:.2f}%".format(ap*100)
+    """
+     Write to results.txt
+    """
+    rounded_prec = [ '%.2f' % elem for elem in prec ]
+    rounded_rec = [ '%.2f' % elem for elem in rec ]
+    results_file.write(text + "\n Precision: " + str(rounded_prec) + "\n Recall   :" + str(rounded_rec) + "\n\n")
     if not args.quiet:
-      print(class_name + " AP = {0:.2f}%".format(ap*100))
-      results_file.write(class_name + " AP = {0:.2f}%\n".format(ap*100))
+      print(text)
     ap_dictionary[class_name] = ap
 
     """
@@ -498,7 +516,7 @@ with open(results_files_path + "/results.txt", 'w') as results_file:
       fig = plt.gcf() # gcf - get current figure
       fig.canvas.set_window_title('AP ' + class_name)
       # set plot title
-      plt.title('class: ' + class_name + ", AP = {0:.2f}%".format(ap*100))
+      plt.title('class: ' + text)
       #plt.suptitle('This is a somewhat long figure title', fontsize=16)
       # set axis titles
       plt.xlabel('Recall')
@@ -518,9 +536,14 @@ with open(results_files_path + "/results.txt", 'w') as results_file:
   if show_animation:
     cv2.destroyAllWindows()
 
+  results_file.write("\n# mAP of all classes\n")
   mAP = sum_AP / n_classes
-  print("mAP = {0:.2f}%".format(mAP*100))
-  results_file.write("mAP = {0:.2f}%\n".format(mAP*100))
+  text = "mAP = {0:.2f}%".format(mAP*100)
+  results_file.write(text + "\n")
+  print(text)
+
+# remove the tmp_files directory
+shutil.rmtree(tmp_files_path)
 
 """
  Draw mAP plot (Show AP's of all classes in decreasing order)
@@ -532,6 +555,3 @@ if draw_plot:
   output_path = results_files_path + "/mAP.jpg"
   to_show = True
   draw_plot_func(ap_dictionary, n_classes, window_title, plot_title, y_label, output_path, to_show)
-
-# remove the tmp_files directory
-shutil.rmtree(tmp_files_path)
