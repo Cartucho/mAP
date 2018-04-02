@@ -19,6 +19,16 @@
     1) Insert result json files into **predicted/**
     2) Run the python script: `python convert_pred_darkflow_json.py`
 
+## Remove specific char delimiter from files
+
+E.g. from:
+`<class_name>;<left>;<top>;<right>;<bottom>`
+to:
+`<class_name> <left> <top> <right> <bottom>`
+
+In the case you have the `--ground-truth` or `--predicted` files in the right format but with a specific char being used as a delimiter (e.g. `";"`), you can remove it by running:
+`python remove_delimiter_char.py --char ";" --ground-truth`
+
 ## Find the files that contain a specific class of objects
 
 1) Run the python script and specify the **class** as argument, e.g.
