@@ -21,4 +21,5 @@
 
 ## Find the files that contain a specific class of objects
 
-1) Run the python script and specify the **class** and **path** as arguments, e.g. `python find_class.py chair ../ground-truth`
+1) Run the python script and specify the **class** as argument, e.g.
+`python find_class.py chair`
