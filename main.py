@@ -212,7 +212,13 @@ for txt_file in ground_truth_files_list:
   # create ground-truth dictionary
   bounding_boxes = []
   for line in lines_list:
-    class_name, left, top, right, bottom = line.split()
+    try:
+      class_name, left, top, right, bottom = line.split()
+    except ValueError:
+      print("Error: File " + txt_file + " in the wrong format.")
+      print(" Expected: <class_name> <left> <top> <right> <bottom>")
+      print(" Received: " + line)
+      sys.exit(0)
     # check if class is in the ignore list, if yes skip
     if class_name in args.ignore:
       continue
