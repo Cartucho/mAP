@@ -215,10 +215,10 @@ for txt_file in ground_truth_files_list:
     try:
       class_name, left, top, right, bottom = line.split()
     except ValueError:
-      print("Error: File " + txt_file + " in the wrong format.")
-      print(" Expected: <class_name> <left> <top> <right> <bottom>")
-      print(" Received: " + line)
-      sys.exit(0)
+      error_msg = "Error: File " + txt_file + " in the wrong format.\n"
+      error_msg += " Expected: <class_name> <left> <top> <right> <bottom>\n"
+      error_msg += " Received: " + line
+      error(error_msg)
     # check if class is in the ignore list, if yes skip
     if class_name in args.ignore:
       continue
@@ -300,8 +300,14 @@ for class_name in unique_classes:
     #print txt_file
     lines = file_lines_to_list(txt_file)
     for line in lines:
-      line_class_name, confidence, left, top, right, bottom = line.split()
-      if line_class_name == class_name:
+      try:
+        tmp_class_name, confidence, left, top, right, bottom = line.split()
+      except ValueError:
+        error_msg = "Error: File " + txt_file + " in the wrong format.\n"
+        error_msg += " Expected: <class_name> <confidence> <left> <top> <right> <bottom>\n"
+        error_msg += " Received: " + line
+        error(error_msg)
+      if tmp_class_name == class_name:
         #print("match")
         file_id = txt_file.split(".txt",1)[0]
         file_id = os.path.basename(os.path.normpath(file_id))
