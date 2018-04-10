@@ -87,7 +87,7 @@ Optional (if you want to see the **animation**):
 
 #### PASCAL VOC, Darkflow and YOLO users
 
-In the [extra](https://github.com/Cartucho/mAP/tree/master/extra) folder you can find additional scripts to convert **PASCAL VOC**, **darkflow** and **Yolo** files into the required format.
+In the [extra](https://github.com/Cartucho/mAP/tree/master/extra) folder you can find additional scripts to convert **PASCAL VOC**, **darkflow** and **YOLO** files into the required format.
 
 #### Create the ground-truth files
 
