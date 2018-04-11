@@ -77,3 +77,4 @@ for tmp_file in txt_list:
       ## add new line to file
       #print(obj_name + " " + str(left) + " " + str(top) + " " + str(right) + " " + str(bottom))
       new_f.write(obj_name + " " + str(left) + " " + str(top) + " " + str(right) + " " + str(bottom) + '\n')
+print("Conversion completed!")

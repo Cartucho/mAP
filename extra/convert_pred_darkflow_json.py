@@ -34,3 +34,4 @@ for tmp_file in json_list:
       new_f.write(obj_name + " " + str(conf) + " " + str(left) + " " + str(top) + " " + str(right) + " " + str(bottom) + '\n')
   # 2. move old file (darkflow format) to backup
   os.rename(tmp_file, "backup/" + tmp_file)
+print("Conversion completed!")

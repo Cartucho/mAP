@@ -34,3 +34,4 @@ for tmp_file in xml_list:
       new_f.write(obj_name + " " + left + " " + top + " " + right + " " + bottom + '\n')
   # 2. move old file (xml format) to backup
   os.rename(tmp_file, "backup/" + tmp_file)
+print("Conversion completed!")

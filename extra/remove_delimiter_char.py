@@ -59,3 +59,4 @@ for txt_file in files_list:
           # remove any white space if existent in the class name
           class_name = class_name.replace(" ", "")
           new_f.write(class_name  + " " + left + " " + top + " " + right + " " + bottom + '\n')
+print("Conversion completed!")

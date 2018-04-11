@@ -21,15 +21,24 @@
 
 ## Remove specific char delimiter from files
 
-E.g. from:
+E.g. remove ";" from:
+
 `<class_name>;<left>;<top>;<right>;<bottom>`
+
 to:
+
 `<class_name> <left> <top> <right> <bottom>`
 
 In the case you have the `--ground-truth` or `--predicted` files in the right format but with a specific char being used as a delimiter (e.g. `";"`), you can remove it by running:
+
 `python remove_delimiter_char.py --char ";" --ground-truth`
 
 ## Find the files that contain a specific class of objects
 
 1) Run the python script and specify the **class** as argument, e.g.
 `python find_class.py chair`
+
+## Remove all the instances of a specific class of objects
+
+1) Run the python script and specify the **class** as argument, e.g.
+`python remove_class.py chair`
