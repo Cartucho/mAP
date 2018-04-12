@@ -21,7 +21,7 @@
 
 ## Remove specific char delimiter from files
 
-E.g. remove ";" from:
+E.g. remove `;` from:
 
 `<class_name>;<left>;<top>;<right>;<bottom>`
 
@@ -35,10 +35,15 @@ In the case you have the `--ground-truth` or `--predicted` files in the right fo
 
 ## Find the files that contain a specific class of objects
 
-1) Run the python script and specify the **class** as argument, e.g.
+1) Run the `find_class.py` script and specify the **class** as argument, e.g.
 `python find_class.py chair`
 
 ## Remove all the instances of a specific class of objects
 
-1) Run the python script and specify the **class** as argument, e.g.
+1) Run the `remove_class.py` script and specify the **class** as argument, e.g.
 `python remove_class.py chair`
+
+## Rename a specific class of objects
+
+1) Run the `rename_class.py` script and specify the **class** and **new class name** as argument, e.g.
+`python rename_class.py chair furniture`
