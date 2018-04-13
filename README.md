@@ -97,7 +97,6 @@ In the [extra](https://github.com/Cartucho/mAP/tree/master/extra) folder you can
     ```
     <class_name> <left> <top> <right> <bottom>
     ```
-    , where `<class_name>` must have no whitespaces between words.
 - E.g. "image_1.txt":
     ```
     tvmonitor 2 10 173 238
@@ -113,7 +112,6 @@ In the [extra](https://github.com/Cartucho/mAP/tree/master/extra) folder you can
     ```
     <class_name> <confidence> <left> <top> <right> <bottom>
     ```
-    , where `<class_name>` must have no whitespaces between words.
 - E.g. "image_1.txt":
     ```
     tvmonitor 0.471781 0 13 174 244

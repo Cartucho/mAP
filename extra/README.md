@@ -45,5 +45,6 @@ In the case you have the `--ground-truth` or `--predicted` files in the right fo
 
 ## Rename a specific class of objects
 
-1) Run the `rename_class.py` script and specify the **class** and **new class name** as argument, e.g.
-`python rename_class.py chair furniture`
+1) Run the `rename_class.py` script and specify the `--current-class-name` and `--new-class-name` as arguments, e.g.
+
+`python rename_class.py --current-class-name Picture Frame --new-class-name PictureFrame`

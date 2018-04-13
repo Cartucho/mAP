@@ -1,13 +1,17 @@
 import sys
 import os
 import glob
+import argparse
 
-if len(sys.argv) != 3:
-  print("Error: wrong format.\nUsage: python rename_class.py [class] [new_class_name]")
-  sys.exit(0)
+parser = argparse.ArgumentParser()
+# argparse current class name to a list (since it can contain more than one word, e.g."dining table")
+parser.add_argument('-c', '--current-class-name', nargs='+', type=str, help="current class name e.g.:\"dining table\".", required=True)
+# new class name (should be a single string without any spaces, e.g. "diningtable")
+parser.add_argument('-n', '--new-class-name', type=str, help="new class name.", required=True)
+args = parser.parse_args()
 
-old_class_name = sys.argv[1]
-new_class_name = sys.argv[2]
+current_class_name = " ".join(args.current_class_name) # join current name to single string
+new_class_name = args.new_class_name
 
 
 def query_yes_no(question, default="yes"):
@@ -43,7 +47,7 @@ def query_yes_no(question, default="yes"):
                              "(or 'y' or 'n').\n")
 
 
-def rename_class(old_class_name, new_class_name):
+def rename_class(current_class_name, new_class_name):
   # get list of txt files
   file_list = glob.glob('*.txt')
   file_list.sort()
@@ -58,10 +62,10 @@ def rename_class(old_class_name, new_class_name):
     new_content = []
     # go through each line of eache file
     for line in content:
-      class_name = line.split()[0]
-      if class_name == old_class_name:
+      #class_name = line.split()[0]
+      if current_class_name in line:
         class_found = True
-        line = line.replace(old_class_name, new_class_name)
+        line = line.replace(current_class_name, new_class_name)
       new_content.append(line)
     if class_found:
       # rewrite file
@@ -71,16 +75,16 @@ def rename_class(old_class_name, new_class_name):
 
 y_n_message = ("Are you sure you want "
                "to rename the class "
-               "\"" + old_class_name + "\" "
+               "\"" + current_class_name + "\" "
                "into \"" + new_class_name + "\"?"
               )
 
 if query_yes_no(y_n_message):
   print(" Ground-Truth folder:")
   os.chdir("../ground-truth")
-  rename_class(old_class_name, new_class_name)
+  rename_class(current_class_name, new_class_name)
   print("  Done!")
   print(" Predicted folder:")
   os.chdir("../predicted")
-  rename_class(old_class_name, new_class_name)
+  rename_class(current_class_name, new_class_name)
   print("  Done!")
