@@ -43,6 +43,7 @@ if not args.no_animation:
     import cv2
     show_animation = True
   except ImportError:
+    print("\"opencv-python\" not found, please install to visualize the results.")
     args.no_animation = True
 
 # try to import Matplotlib if the user didn't choose the option --no-plot
@@ -52,6 +53,7 @@ if not args.no_plot:
     import matplotlib.pyplot as plt
     draw_plot = True
   except ImportError:
+    print("\"matplotlib\" not found, please install it to get the resulting plots.")
     args.no_plot = True
 
 """
