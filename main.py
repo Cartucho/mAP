@@ -149,21 +149,22 @@ def draw_text_in_image(img, text, pos, color, line_width):
 """
  Draw plot using Matplotlib
 """
-def draw_plot_func(dictionary, n_classes, window_title, plot_title, y_label, output_path, to_show):
+def draw_plot_func(dictionary, n_classes, window_title, plot_title, y_label, output_path, to_show, plot_color):
     # sort the dictionary by decreasing value (reverse=True), into a list of tuples
     sorted_dic_by_value = sorted(dictionary.items(), key=operator.itemgetter(1), reverse=True)
     # unpacking the list of tuples into two lists
     sorted_keys, sorted_values = zip(*sorted_dic_by_value)
-    plt.bar(range(n_classes), sorted_values, align='center')
-    plt.xticks(range(n_classes), sorted_keys, rotation='vertical')
+    plt.bar(range(n_classes), sorted_values, align='center', color=plot_color)
+    # write classes in x axis "vertically"
+    plt.xticks(range(n_classes), sorted_keys, rotation='vertical', fontsize=12)
     # set window title
     fig = plt.gcf() # gcf - get current figure
     fig.canvas.set_window_title(window_title)
     # set plot title
-    plt.title(plot_title)
+    plt.title(plot_title, fontsize=14)
     # set axis titles
     # plt.xlabel('classes')
-    plt.ylabel(y_label)
+    plt.ylabel(y_label, fontsize='large')
     # adjust size of window
     fig.tight_layout()
     if to_show:
@@ -276,9 +277,10 @@ if draw_plot:
   window_title = "Ground-Truth Info"
   plot_title = "Total of ground-truth files = " + str(len(ground_truth_files_list))
   y_label = "Number of objects per class"
-  output_path = results_files_path + "/Ground-Truth Info.jpg"
+  output_path = results_files_path + "/Ground-Truth Info.png"
   to_show = False
-  draw_plot_func(gt_counter_per_class, n_classes, window_title, plot_title, y_label, output_path, to_show)
+  plot_color = 'green'
+  draw_plot_func(gt_counter_per_class, n_classes, window_title, plot_title, y_label, output_path, to_show, plot_color)
 
 """
  Write number of ground-truth objects per class to results.txt
@@ -334,11 +336,12 @@ for class_name in unique_classes:
 """
 if draw_plot:
   window_title = "Predicted Objects Info"
-  plot_title = "Total of Predicted Objects files = " + str(len(predicted_files_list))
+  plot_title = "Total of predicted objects files = " + str(len(predicted_files_list))
   y_label = "Number of objects per class"
-  output_path = results_files_path + "/Predicted Objects Info.jpg"
+  output_path = results_files_path + "/Predicted Objects Info.png"
   to_show = False
-  draw_plot_func(pred_counter_per_class, n_classes, window_title, plot_title, y_label, output_path, to_show)
+  plot_color = 'green'
+  draw_plot_func(pred_counter_per_class, n_classes, window_title, plot_title, y_label, output_path, to_show, plot_color)
 
 """
  Write number of predicted objects per class to results.txt
@@ -546,7 +549,7 @@ with open(results_files_path + "/results.txt", 'a') as results_file:
       # Alternative option -> normal display
       #plt.show()
       # save the plot
-      fig.savefig(results_files_path + "/classes/" + class_name + ".jpg")
+      fig.savefig(results_files_path + "/classes/" + class_name + ".png")
       plt.cla() # clear axes for next plot
 
   if show_animation:
@@ -568,6 +571,7 @@ if draw_plot:
   window_title = "mAP"
   plot_title = "mAP = {0:.2f}%".format(mAP*100)
   y_label = "Average Precision"
-  output_path = results_files_path + "/mAP.jpg"
+  output_path = results_files_path + "/mAP.png"
   to_show = True
-  draw_plot_func(ap_dictionary, n_classes, window_title, plot_title, y_label, output_path, to_show)
+  plot_color = 'blue'
+  draw_plot_func(ap_dictionary, n_classes, window_title, plot_title, y_label, output_path, to_show, plot_color)
