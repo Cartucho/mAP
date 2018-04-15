@@ -279,7 +279,7 @@ if draw_plot:
   y_label = "Number of objects per class"
   output_path = results_files_path + "/Ground-Truth Info.png"
   to_show = False
-  plot_color = 'green'
+  plot_color = 'forestgreen'
   draw_plot_func(gt_counter_per_class, n_classes, window_title, plot_title, y_label, output_path, to_show, plot_color)
 
 """
@@ -340,7 +340,7 @@ if draw_plot:
   y_label = "Number of objects per class"
   output_path = results_files_path + "/Predicted Objects Info.png"
   to_show = False
-  plot_color = 'green'
+  plot_color = 'forestgreen'
   draw_plot_func(pred_counter_per_class, n_classes, window_title, plot_title, y_label, output_path, to_show, plot_color)
 
 """
@@ -573,5 +573,5 @@ if draw_plot:
   y_label = "Average Precision"
   output_path = results_files_path + "/mAP.png"
   to_show = True
-  plot_color = 'blue'
+  plot_color = 'royalblue'
   draw_plot_func(ap_dictionary, n_classes, window_title, plot_title, y_label, output_path, to_show, plot_color)
