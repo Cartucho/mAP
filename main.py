@@ -156,7 +156,12 @@ def draw_plot_func(dictionary, n_classes, window_title, plot_title, y_label, out
     sorted_keys, sorted_values = zip(*sorted_dic_by_value)
     plt.bar(range(n_classes), sorted_values, align='center', color=plot_color)
     # write classes in x axis "vertically"
-    plt.xticks(range(n_classes), sorted_keys, rotation='vertical', fontsize=12)
+    if n_classes <= 30:
+      plt.xticks(range(n_classes), sorted_keys, rotation='vertical', fontsize=12)
+    else:
+      # if there are more than 30 classes we need to use the default font size
+      #   otherwise the labels start to overlap each other
+      plt.xticks(range(n_classes), sorted_keys, rotation='vertical')
     # set window title
     fig = plt.gcf() # gcf - get current figure
     fig.canvas.set_window_title(window_title)
@@ -167,10 +172,11 @@ def draw_plot_func(dictionary, n_classes, window_title, plot_title, y_label, out
     plt.ylabel(y_label, fontsize='large')
     # adjust size of window
     fig.tight_layout()
-    if to_show:
-      plt.show()
     # save the plot
     fig.savefig(output_path)
+    # show image
+    if to_show:
+      plt.show()
     # clear the plot
     plt.clf()
 
@@ -275,7 +281,8 @@ if specific_iou_flagged:
 """
 if draw_plot:
   window_title = "Ground-Truth Info"
-  plot_title = "Total of ground-truth files = " + str(len(ground_truth_files_list))
+  plot_title = "Ground-Truth\n"
+  plot_title += "(" + str(len(ground_truth_files_list)) + " files and " + str(n_classes) + " classes)"
   y_label = "Number of objects per class"
   output_path = results_files_path + "/Ground-Truth Info.png"
   to_show = False
@@ -336,7 +343,12 @@ for class_name in unique_classes:
 """
 if draw_plot:
   window_title = "Predicted Objects Info"
-  plot_title = "Total of predicted objects files = " + str(len(predicted_files_list))
+  # Plot title
+  plot_title = "Predicted Objects\n"
+  plot_title += "(" + str(len(predicted_files_list)) + " files and "
+  count_non_zero_values_in_dictionary = sum(x > 0 for x in list(pred_counter_per_class.values()))
+  plot_title += str(count_non_zero_values_in_dictionary) + " detected classes)"
+  # end Plot title
   y_label = "Number of objects per class"
   output_path = results_files_path + "/Predicted Objects Info.png"
   to_show = False
@@ -514,7 +526,7 @@ with open(results_files_path + "/results.txt", 'a') as results_file:
 
     ap, mrec, mprec = voc_ap(rec, prec)
     sum_AP += ap
-    text = class_name + " AP = {0:.2f}%".format(ap*100)
+    text = "{0:.2f}%".format(ap*100) + " = " + class_name + " AP  " #class_name + " AP = {0:.2f}%".format(ap*100)
     """
      Write to results.txt
     """
