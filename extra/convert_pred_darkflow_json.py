@@ -17,7 +17,7 @@ if not os.path.exists("backup"):
 # create VOC format files
 json_list = glob.glob('*.json')
 if len(json_list) == 0:
-  print("Error: no .xml files found in ground-truth")
+  print("Error: no .json files found in predicted")
   sys.exit()
 for tmp_file in json_list:
   #print(tmp_file)
