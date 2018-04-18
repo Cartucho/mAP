@@ -145,64 +145,102 @@ def draw_text_in_image(img, text, pos, color, line_width):
   text_width, _ = cv2.getTextSize(text, font, fontScale, lineType)[0]
   return img, (line_width + text_width)
 
+"""
+ Plot - adjust axes
+"""
+def adjust_axes(r, t, fig, axes):
+  # get text width for re-scaling
+  bb = t.get_window_extent(renderer=r)
+  text_width_inches = bb.width / fig.dpi
+  # get axis width in inches
+  current_fig_width = fig.get_figwidth()
+  new_fig_width = current_fig_width + text_width_inches
+  propotion = new_fig_width / current_fig_width
+  # get axis limit
+  x_lim = axes.get_xlim()
+  axes.set_xlim([x_lim[0], x_lim[1]*propotion])
 
 """
  Draw plot using Matplotlib
 """
-def draw_plot_func(dictionary, n_classes, window_title, plot_title, y_label, output_path, to_show, plot_color, true_p_bar):
-  # set window title
-  fig = plt.gcf() # gcf - get current figure
-  fig.canvas.set_window_title(window_title)
-  # sort the dictionary by decreasing value (reverse=True), into a list of tuples
-  sorted_dic_by_value = sorted(dictionary.items(), key=operator.itemgetter(1), reverse=True)
+def draw_plot_func(dictionary, n_classes, window_title, plot_title, x_label, output_path, to_show, plot_color, true_p_bar):
+  # sort the dictionary by decreasing value, into a list of tuples
+  sorted_dic_by_value = sorted(dictionary.items(), key=operator.itemgetter(1))
   # unpacking the list of tuples into two lists
   sorted_keys, sorted_values = zip(*sorted_dic_by_value)
-  # special case to draw in (green, true predictions) & (red, false predictions)
+  # 
   if true_p_bar != "":
+    """
+     Special case to draw in (green=true predictions) & (red=false predictions)
+    """
     fp_sorted = []
     tp_sorted = []
     for key in sorted_keys:
       fp_sorted.append(dictionary[key] - true_p_bar[key])
       tp_sorted.append(true_p_bar[key])
-    plt.bar(range(n_classes), fp_sorted, align='center', color='crimson', label='False Predictions')
-    plt.bar(range(n_classes), tp_sorted, align='center', color='forestgreen', label='True Predictions', bottom=fp_sorted)
+    plt.barh(range(n_classes), fp_sorted, align='center', color='crimson', label='False Predictions')
+    plt.barh(range(n_classes), tp_sorted, align='center', color='forestgreen', label='True Predictions', left=fp_sorted)
     # add legend
-    plt.legend(loc='best')
-    # write number on top of bar
+    plt.legend(loc='lower right')
+    """
+     Write number on side of bar
+    """
+    fig = plt.gcf() # gcf - get current figure
+    axes = plt.gca()
+    r = fig.canvas.get_renderer()
     for i, val in enumerate(sorted_values):
-      if i == 0:
-        # re-scale plot to write numbers on top
-        axes = plt.gca() # get current axes
-        axes.set_ylim([0,sorted_values[0]*1.25]) # this only works since the first value is the largest
       fp_val = fp_sorted[i]
-      y_fp_offset = len(str(fp_val) * 7) # 'hack' to find top offset
       tp_val = tp_sorted[i]
-      y_tp_offset = y_fp_offset + len(str(tp_val)) * 7 + 2
-      # (- 0.4) because the bar's default width=0.8
-      plt.annotate(str(fp_val), xy=(i - 0.4,val), color='crimson', fontweight='bold', rotation='vertical', xytext=(0,y_fp_offset), textcoords='offset points')
-      plt.annotate(str(tp_val), xy=(i - 0.4,val), color='forestgreen', fontweight='bold', rotation='vertical', xytext=(0,y_tp_offset), textcoords='offset points')
+      fp_str_val = " " + str(fp_val)
+      tp_str_val = fp_str_val + " " + str(tp_val)
+      # trick to paint multicolor with offset:
+      #   first paint everything and then repaint the first number
+      t = plt.text(val, i, tp_str_val, color='forestgreen', va='center', fontweight='bold')
+      plt.text(val, i, fp_str_val, color='crimson', va='center', fontweight='bold')
+      if i == (len(sorted_values)-1): # largest bar
+        adjust_axes(r, t, fig, axes)
   else:
-    plt.bar(range(n_classes), sorted_values, align='center', color=plot_color)
-    # write number on top of bar
+    plt.barh(range(n_classes), sorted_values, color=plot_color)
+    """
+     Write number on side of bar
+    """
+    fig = plt.gcf() # gcf - get current figure
+    axes = plt.gca()
+    r = fig.canvas.get_renderer()
     for i, val in enumerate(sorted_values):
-      if i == 0:
-        # re-scale plot to write numbers on top
-        axes = plt.gca() # get current axes
-        axes.set_ylim([0,sorted_values[0]*1.25]) # this only works since the first value is the largest
-      str_val = str(val)
+      str_val = " " + str(val) # add a space before
       if val <= 1.0:
-        str_val = "{0:.2f}".format(val)
-      y_offset = len(str_val) * 7 # 'hack' to find top offset
-      # (- 0.4) because the bar's default width=0.8
-      plt.annotate(str_val, xy=(i - 0.4,val), color=plot_color, fontweight='bold', rotation='vertical', xytext=(0,y_offset), textcoords='offset points')
+        str_val = " {0:.2f}".format(val)
+      t = plt.text(val, i, str_val, color=plot_color, va='center', fontweight='bold')
+      # re-set axes to show number inside the figure
+      if i == (len(sorted_values)-1): # largest bar
+        adjust_axes(r, t, fig, axes)
+  # set window title
+  fig.canvas.set_window_title(window_title)
+  # write classes in y axis
+  tick_font_size = 12
+  plt.yticks(range(n_classes), sorted_keys, fontsize=tick_font_size)
+  """
+   Re-scale height accordingly
+  """
+  init_height = fig.get_figheight()
+  # comput the matrix height in points and inches
+  dpi = fig.dpi
+  height_pt = n_classes * (tick_font_size * 1.4) # 1.4 (some spacing)
+  height_in = height_pt / dpi
+  # compute the required figure height 
+  top_margin = 0.15    # in percentage of the figure height
+  bottom_margin = 0.05 # in percentage of the figure height
+  figure_height = height_in / (1 - top_margin - bottom_margin)
+  # set new height
+  if figure_height > init_height:
+    fig.set_figheight(figure_height)
 
-  # write classes in x axis "vertically"
-  plt.xticks(range(n_classes), sorted_keys, rotation='vertical')
   # set plot title
   plt.title(plot_title, fontsize=14)
   # set axis titles
   # plt.xlabel('classes')
-  plt.ylabel(y_label, fontsize='large')
+  plt.xlabel(x_label, fontsize='large')
   # adjust size of window
   fig.tight_layout()
   # save the plot
@@ -210,8 +248,8 @@ def draw_plot_func(dictionary, n_classes, window_title, plot_title, y_label, out
   # show image
   if to_show:
     plt.show()
-  # clear the plot
-  plt.clf()
+  # close the plot
+  plt.close()
 
 """
  Create a "tmp_files/" and "results/" directory
@@ -308,37 +346,6 @@ if specific_iou_flagged:
       error('Error, IoU must be between 0.0 and 1.0. Flag usage:' + error_msg)
 
 """
- Plot the total number of occurences of each class in the ground-truth
-"""
-if draw_plot:
-  window_title = "Ground-Truth Info"
-  plot_title = "Ground-Truth\n"
-  plot_title += "(" + str(len(ground_truth_files_list)) + " files and " + str(n_classes) + " classes)"
-  y_label = "Number of objects per class"
-  output_path = results_files_path + "/Ground-Truth Info.png"
-  to_show = False
-  plot_color = 'forestgreen'
-  draw_plot_func(
-    gt_counter_per_class,
-    n_classes,
-    window_title,
-    plot_title,
-    y_label,
-    output_path,
-    to_show,
-    plot_color,
-    '',
-    )
-
-"""
- Write number of ground-truth objects per class to results.txt
-"""
-with open(results_files_path + "/results.txt", 'w') as results_file:
-  results_file.write("# Number of ground-truth objects per class\n")
-  for class_name in sorted(gt_counter_per_class):
-    results_file.write(class_name + ": " + str(gt_counter_per_class[class_name]) + "\n")
-
-"""
  Predicted
    Load each of the predicted files into a temporary ".json" file.
 """
@@ -381,8 +388,8 @@ for class_index, class_name in enumerate(gt_classes):
 sum_AP = 0.0
 ap_dictionary = {}
 # open file to store the results
-with open(results_files_path + "/results.txt", 'a') as results_file:
-  results_file.write("\n# AP and precision/recall per class\n")
+with open(results_files_path + "/results.txt", 'w') as results_file:
+  results_file.write("# AP and precision/recall per class\n")
   count_true_positives = {}
   for class_index, class_name in enumerate(gt_classes):
     count_true_positives[class_name] = 0
@@ -614,6 +621,38 @@ for txt_file in predicted_files_list:
 #print(pred_counter_per_class)
 pred_classes = list(pred_counter_per_class.keys())
 
+
+"""
+ Plot the total number of occurences of each class in the ground-truth
+"""
+if draw_plot:
+  window_title = "Ground-Truth Info"
+  plot_title = "Ground-Truth\n"
+  plot_title += "(" + str(len(ground_truth_files_list)) + " files and " + str(n_classes) + " classes)"
+  x_label = "Number of objects per class"
+  output_path = results_files_path + "/Ground-Truth Info.png"
+  to_show = False
+  plot_color = 'forestgreen'
+  draw_plot_func(
+    gt_counter_per_class,
+    n_classes,
+    window_title,
+    plot_title,
+    x_label,
+    output_path,
+    to_show,
+    plot_color,
+    '',
+    )
+
+"""
+ Write number of ground-truth objects per class to results.txt
+"""
+with open(results_files_path + "/results.txt", 'a') as results_file:
+  results_file.write("\n# Number of ground-truth objects per class\n")
+  for class_name in sorted(gt_counter_per_class):
+    results_file.write(class_name + ": " + str(gt_counter_per_class[class_name]) + "\n")
+
 """
  Finish counting true positives
 """
@@ -634,7 +673,7 @@ if draw_plot:
   count_non_zero_values_in_dictionary = sum(x > 0 for x in list(pred_counter_per_class.keys()))
   plot_title += str(count_non_zero_values_in_dictionary) + " detected classes)"
   # end Plot title
-  y_label = "Number of objects per class"
+  x_label = "Number of objects per class"
   output_path = results_files_path + "/Predicted Objects Info.png"
   to_show = False
   plot_color = 'forestgreen'
@@ -644,7 +683,7 @@ if draw_plot:
     len(pred_counter_per_class),
     window_title,
     plot_title,
-    y_label,
+    x_label,
     output_path,
     to_show,
     plot_color,
@@ -669,7 +708,7 @@ with open(results_files_path + "/results.txt", 'a') as results_file:
 if draw_plot:
   window_title = "mAP"
   plot_title = "mAP = {0:.2f}%".format(mAP*100)
-  y_label = "Average Precision"
+  x_label = "Average Precision"
   output_path = results_files_path + "/mAP.png"
   to_show = True
   plot_color = 'royalblue'
@@ -678,7 +717,7 @@ if draw_plot:
     n_classes,
     window_title,
     plot_title,
-    y_label,
+    x_label,
     output_path,
     to_show,
     plot_color,
