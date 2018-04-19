@@ -45,7 +45,9 @@ No approximation is involved since the curve is piecewise constant.
 
 We calculate the mean of all the AP's, resulting in an mAP value from 0 to 100%. E.g:
 
-<img src="https://user-images.githubusercontent.com/15831541/37559152-eed3f002-2a18-11e8-83e0-2da3c898194a.jpg" width="60%" height="60%" />
+<img src="https://user-images.githubusercontent.com/15831541/38933241-5f9556ae-4310-11e8-9d47-cb205f9b103b.png"/>
+
+<img src="https://user-images.githubusercontent.com/15831541/38933180-366b6fca-4310-11e8-99b9-17ad4b159b86.png" />
 
 ## Prerequisites
 
