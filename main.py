@@ -670,7 +670,7 @@ if draw_plot:
   # Plot title
   plot_title = "Predicted Objects\n"
   plot_title += "(" + str(len(predicted_files_list)) + " files and "
-  count_non_zero_values_in_dictionary = sum(x > 0 for x in list(pred_counter_per_class.keys()))
+  count_non_zero_values_in_dictionary = sum(int(x) > 0 for x in list(pred_counter_per_class.values()))
   plot_title += str(count_non_zero_values_in_dictionary) + " detected classes)"
   # end Plot title
   x_label = "Number of objects per class"
