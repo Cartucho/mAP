@@ -505,7 +505,8 @@ with open(results_files_path + "/results.txt", 'w') as results_file:
           img, _ = draw_text_in_image(img, text, (margin + line_width, v_pos), color, line_width)
         # 2nd line
         v_pos += int(bottom_border / 2)
-        text = "Prediction confidence: {0:.2f}% ".format(float(prediction["confidence"])*100)
+        rank_pos = str(idx+1) # rank position (idx starts at 0)
+        text = "Prediction #rank: " + rank_pos + " confidence: {0:.2f}% ".format(float(prediction["confidence"])*100)
         img, line_width = draw_text_in_image(img, text, (margin, v_pos), white, 0)
         color = light_red
         if status == "MATCH!":
