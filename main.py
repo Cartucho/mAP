@@ -275,6 +275,8 @@ if show_animation:
 """
 # get a list with the ground-truth files
 ground_truth_files_list = glob.glob('ground-truth/*.txt')
+if len(ground_truth_files_list) == 0:
+  error("Error: No ground-truth files found!")
 ground_truth_files_list.sort()
 # dictionary with counter per class
 gt_counter_per_class = {}
