@@ -209,7 +209,7 @@ def draw_plot_func(dictionary, n_classes, window_title, plot_title, x_label, out
     r = fig.canvas.get_renderer()
     for i, val in enumerate(sorted_values):
       str_val = " " + str(val) # add a space before
-      if val <= 1.0:
+      if val < 1.0:
         str_val = " {0:.2f}".format(val)
       t = plt.text(val, i, str_val, color=plot_color, va='center', fontweight='bold')
       # re-set axes to show number inside the figure
