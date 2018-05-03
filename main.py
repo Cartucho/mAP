@@ -97,7 +97,7 @@ def voc_ap(rec, prec):
   rec.append(1.0) # insert 1.0 at end of list
   mrec = rec[:]
   prec.insert(0, 0.0) # insert 0.0 at begining of list
-  prec.append(0.0) # insert 1.0 at end of list
+  prec.append(0.0) # insert 0.0 at end of list
   mpre = prec[:]
   # matlab indexes start in 1 but python in 0, so I have to do:
   #   range(start=(len(mpre) - 2), end=0, step=-1)
