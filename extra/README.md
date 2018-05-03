@@ -19,6 +19,13 @@
     1) Insert result json files into **predicted/**
     2) Run the python script: `python convert_pred_darkflow_json.py`
 
+- ### convert YOLO to our format:
+
+    1) Add class list to the file `class_list.txt`
+    2) Insert predicted objects files into **predicted/**
+    3) Insert images into **images/**
+    4) Run the python script: `python convert_pred_yolo.py`
+
 ## Remove specific char delimiter from files
 
 E.g. remove `;` from:

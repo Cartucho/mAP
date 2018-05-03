@@ -42,7 +42,7 @@ if not os.path.exists("backup"):
 # create VOC format files
 txt_list = glob.glob('*.txt')
 if len(txt_list) == 0:
-  print("Error: no .txt files found in ground-truth")
+  print("Error: no .txt files found in predicted")
   sys.exit()
 for tmp_file in txt_list:
   #print(tmp_file)
@@ -75,11 +75,9 @@ for tmp_file in txt_list:
     for line in content:
       ## split a line by spaces.
       ## "c" stands for center and "n" stands for normalized
-	  ## added conf for class confidence from Darknet Yolov2
       obj_id, conf, x_c_n, y_c_n, width_n, height_n = line.split()
       obj_name = obj_list[int(obj_id)]
       left, top, right, bottom = convert_yolo_coordinates_to_voc(x_c_n, y_c_n, width_n, height_n, img_width, img_height)
-      ## add new line to file - print conf, JeallyBeans/kuk
-      #print(obj_name + " " + str(left) + " " + str(top) + " " + str(right) + " " + str(bottom))
+      #print(obj_name + " " + str(conf) + " " + str(left) + " " + str(top) + " " + str(right) + " " + str(bottom))
       new_f.write(obj_name + " " + str(conf) + " " str(left) + " " + str(top) + " " + str(right) + " " + str(bottom) + '\n')
 print("Conversion completed!")
