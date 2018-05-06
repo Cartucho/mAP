@@ -57,6 +57,8 @@ In the case you have the `--ground-truth` or `--predicted` files in the right fo
 `python rename_class.py --current-class-name Picture Frame --new-class-name PictureFrame`
 
 ## Rename all classes by replacing spaces with delimiters
+Use this option instead of the above option when you have a lot of classes with spaces.
+It's useful when renaming classes with spaces become tedious (because you have a lot of them).
 
 1) Add class list to the file `class_list.txt` (the script will search this file for class names with spaces)
 2) Run the `remove_space.py` script and specify the `--delimiter` (default: "-") and `--yes` if you want to force confirmation on all yes/no queries, e.g.
