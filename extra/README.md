@@ -55,3 +55,10 @@ In the case you have the `--ground-truth` or `--predicted` files in the right fo
 1) Run the `rename_class.py` script and specify the `--current-class-name` and `--new-class-name` as arguments, e.g.
 
 `python rename_class.py --current-class-name Picture Frame --new-class-name PictureFrame`
+
+## Rename all classes by replacing spaces with delimiters
+
+1) Add class list to the file `class_list.txt` (the script will search this file for class names with spaces)
+2) Run the `remove_space.py` script and specify the `--delimiter` (default: "-") and `--yes` if you want to force confirmation on all yes/no queries, e.g.
+
+`python remove_space.py --delimiter "-" --yes`
