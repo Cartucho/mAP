@@ -298,7 +298,7 @@ for txt_file in ground_truth_files_list:
   file_id = os.path.basename(os.path.normpath(file_id))
   # check if there is a correspondent predicted objects file
   if not os.path.exists('predicted/' + file_id + ".txt"):
-    error("Error. File not found: predicted/" +  file_id + ".txt")
+    error("Error. File not found: predicted/" +  file_id + ".txt\nYou can check extra/intersect-gt-and-pred.py script for help.")
   lines_list = file_lines_to_list(txt_file)
   # create ground-truth dictionary
   bounding_boxes = []
@@ -375,7 +375,7 @@ for class_index, class_name in enumerate(gt_classes):
     file_id = os.path.basename(os.path.normpath(file_id))
     if class_index == 0:
       if not os.path.exists('ground-truth/' + file_id + ".txt"):
-        error("Error. File not found: ground-truth/" +  file_id + ".txt")
+        error("Error. File not found: ground-truth/" +  file_id + ".txt\nYou can check extra/intersect-gt-and-pred.py script for help.")
     lines = file_lines_to_list(txt_file)
     for line in lines:
       try:
