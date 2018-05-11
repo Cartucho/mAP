@@ -64,3 +64,16 @@ It's useful when renaming classes with spaces become tedious (because you have a
 2) Run the `remove_space.py` script and specify the `--delimiter` (default: "-") and `--yes` if you want to force confirmation on all yes/no queries, e.g.
 
 `python remove_space.py --delimiter "-" --yes`
+
+## Intersect ground-truth and predicted files
+This script ensures same number of files in ground-truth and predicted folder.
+When you encounter file not found error, it's usually because you have
+mismatched numbers of ground-truth and predicted files.
+You can use this script to move ground-truth and predicted files that are
+not in the intersection into a backup folder (backup2).
+This will retain only files that have the same name in both folders.
+
+1) Prepare `.txt` files in your `ground-truth` and `predicted` folders.
+2) Run the `intersect-gt-and-pred.py` script to move non-intersected files into a backup folder (default: `backup2`).
+
+`python intersect-gt-and-pred.py`
