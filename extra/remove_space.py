@@ -3,7 +3,7 @@ import os
 import glob
 import argparse
 
-# this script will load class_list.txt and find class names that have spaces in them
+# this script will load class_list.txt and find class names with spaces
 # then replace spaces with delimiters inside ground-truth/ and predicted/
 
 parser = argparse.ArgumentParser()
@@ -34,6 +34,8 @@ def query_yes_no(question, default="yes", bypass=False):
 
   while True:
     sys.stdout.write(question + prompt)
+    if bypass:
+        break
     if sys.version_info[0] == 3:
       choice = input().lower() # if version 3 of Python
     else:
