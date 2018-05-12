@@ -70,10 +70,10 @@ This script ensures same number of files in ground-truth and predicted folder.
 When you encounter file not found error, it's usually because you have
 mismatched numbers of ground-truth and predicted files.
 You can use this script to move ground-truth and predicted files that are
-not in the intersection into a backup folder (backup2).
+not in the intersection into a backup folder (backup_no_matches_found).
 This will retain only files that have the same name in both folders.
 
 1) Prepare `.txt` files in your `ground-truth` and `predicted` folders.
-2) Run the `intersect-gt-and-pred.py` script to move non-intersected files into a backup folder (default: `backup2`).
+2) Run the `intersect-gt-and-pred.py` script to move non-intersected files into a backup folder (default: `backup_no_matches_found`).
 
 `python intersect-gt-and-pred.py`

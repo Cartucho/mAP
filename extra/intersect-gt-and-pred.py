@@ -6,23 +6,23 @@ import glob
 ## When you encounter file not found error, it's usually because you have
 ## mismatched numbers of ground-truth and predicted files.
 ## You can use this script to move ground-truth and predicted files that are
-## not in the intersection into a backup folder (backup2).
+## not in the intersection into a backup folder (backup_no_matches_found).
 ## This will retain only files that have the same name in both folders.
 
 # change directory to the one with the files to be changed
 path_to_gt = '../ground-truth'
 path_to_pred = '../predicted'
-backup_folder = 'backup2' # must end without slash
+backup_folder = 'backup_no_matches_found' # must end without slash
 
 os.chdir(path_to_gt)
 gt_files = glob.glob('*.txt')
 if len(gt_files) == 0:
-    print("Error: no .txt files found in ground-truth/")
+    print("Error: no .txt files found in", path_to_gt)
     sys.exit()
 os.chdir(path_to_pred)
 pred_files = glob.glob('*.txt')
 if len(pred_files) == 0:
-    print("Error: no .txt files found in predicted/")
+    print("Error: no .txt files found in", path_to_pred)
     sys.exit()
 
 gt_files = set(gt_files)
