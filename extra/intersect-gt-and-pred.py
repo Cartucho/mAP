@@ -34,12 +34,12 @@ print()
 gt_backup = gt_files - pred_files
 pred_backup = pred_files - gt_files
 
-def backup(folder, backup_files, backup_folder):
+def backup(src_folder, backup_files, backup_folder):
     # non-intersection files (txt format) will be moved to a backup folder
     if not backup_files:
-        print('No backup required for', folder)
+        print('No backup required for', src_folder)
         return
-    os.chdir(folder)
+    os.chdir(src_folder)
     ## create the backup dir if it doesn't exist already
     if not os.path.exists(backup_folder):
         os.makedirs(backup_folder)
