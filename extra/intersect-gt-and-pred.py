@@ -48,8 +48,10 @@ def backup(src_folder, backup_files, backup_folder):
     
 backup(path_to_gt, gt_backup, backup_folder)
 backup(path_to_pred, pred_backup, backup_folder)
-print('total ground-truth backup files:', len(gt_backup))
-print('total predicted backup files:', len(pred_backup))
+if gt_backup:
+    print('total ground-truth backup files:', len(gt_backup))
+if pred_backup:
+    print('total predicted backup files:', len(pred_backup))
 
 intersection = gt_files & pred_files
 print('total intersected files:', len(intersection))
