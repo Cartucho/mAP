@@ -77,7 +77,7 @@ def rename_class(current_class_name, new_class_name):
 
 with open('class_list.txt') as f:
     for line in f:
-        current_class_name = line
+        current_class_name = line.rstrip("\n")
         new_class_name = line.replace(' ', args.delimiter)
         if line == new_class_name:
             continue
