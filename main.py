@@ -102,6 +102,8 @@ def voc_ap(rec, prec):
   """
    This part makes the precision monotonically decreasing
     (goes from the end to the beginning)
+    matlab:  for i=numel(mpre)-1:-1:1
+                mpre(i)=max(mpre(i),mpre(i+1));
   """
   # matlab indexes start in 1 but python in 0, so I have to do:
   #   range(start=(len(mpre) - 2), end=0, step=-1)
@@ -111,8 +113,8 @@ def voc_ap(rec, prec):
     mpre[i] = max(mpre[i], mpre[i+1])
   """
    This part creates a list of indexes where the recall changes
+    matlab:  i=find(mrec(2:end)~=mrec(1:end-1))+1;
   """
-  # matlab: i=find(mrec(2:end)~=mrec(1:end-1))+1;
   i_list = []
   for i in range(1, len(mrec)):
     if mrec[i] != mrec[i-1]:
@@ -120,8 +122,8 @@ def voc_ap(rec, prec):
   """
    The Average Precision (AP) is the area under the curve
     (numerical integration)
+    matlab: ap=sum((mrec(i)-mrec(i-1)).*mpre(i));
   """
-  # matlab: ap=sum((mrec(i)-mrec(i-1)).*mpre(i));
   ap = 0.0
   for i in i_list:
     ap += ((mrec[i]-mrec[i-1])*mpre[i])
@@ -582,7 +584,11 @@ with open(results_files_path + "/results.txt", 'w') as results_file:
     """
     if draw_plot:
       plt.plot(rec, prec, '-o')
-      plt.fill_between(mrec, 0, mprec, alpha=0.2, edgecolor='r')
+      # add a new penultimate point to the list (mrec[-2], 0.0)
+      # since the last line segment (and respective area) do not affect the AP value
+      area_under_curve_x = mrec[:-1] + [mrec[-2]] + [mrec[-1]]
+      area_under_curve_y = mprec[:-1] + [0.0] + [mprec[-1]]
+      plt.fill_between(area_under_curve_x, 0, area_under_curve_y, alpha=0.2, edgecolor='r')
       # set window title
       fig = plt.gcf() # gcf - get current figure
       fig.canvas.set_window_title('AP ' + class_name)

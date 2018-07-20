@@ -34,7 +34,7 @@ First, your neural net **predicted objects** are sorted by decreasing confidence
 
 Using this criterium, we calculate the precision/recall curve. E.g:
 
-<img src="https://user-images.githubusercontent.com/15831541/37722176-3fd0f3e4-2d23-11e8-961c-29001ea2a6b8.png" width="65%" height="65%" />
+<img src="https://user-images.githubusercontent.com/15831541/43008995-64dd53ce-8c34-11e8-8a2c-4567b1311910.png" width="45%" height="45%" />
 
 Then we compute a version of the measured precision/recall curve with **precision monotonically decreasing** (shown in light red), by setting the precision for recall `r` to the maximum precision obtained for any recall `r' > r`.
 
