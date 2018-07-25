@@ -97,13 +97,14 @@ In the [extra](https://github.com/Cartucho/mAP/tree/master/extra) folder you can
 - Use **matching names** (e.g. image: "image_1.jpg", ground-truth: "image_1.txt"; "image_2.jpg", "image_2.txt"...).
 - In these files, each line should be in the following format:
     ```
-    <class_name> <left> <top> <right> <bottom>
+    <class_name> <left> <top> <right> <bottom> [<difficult>]
     ```
+- The `difficult` parameter is optional, use it if you want to ignore a specific prediction.
 - E.g. "image_1.txt":
     ```
     tvmonitor 2 10 173 238
     book 439 157 556 241
-    book 437 246 518 351
+    book 437 246 518 351 difficult
     pottedplant 272 190 316 259
     ```
 #### Create the predicted objects files

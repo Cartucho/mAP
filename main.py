@@ -306,27 +306,36 @@ for txt_file in ground_truth_files_list:
   lines_list = file_lines_to_list(txt_file)
   # create ground-truth dictionary
   bounding_boxes = []
+  is_difficult = False
   for line in lines_list:
     try:
-      class_name, left, top, right, bottom = line.split()
+      if "difficult" in line:
+          class_name, left, top, right, bottom, _difficult = line.split()
+          is_difficult = True
+      else:
+          class_name, left, top, right, bottom = line.split()
     except ValueError:
       error_msg = "Error: File " + txt_file + " in the wrong format.\n"
-      error_msg += " Expected: <class_name> <left> <top> <right> <bottom>\n"
+      error_msg += " Expected: <class_name> <left> <top> <right> <bottom> ['difficult']\n"
       error_msg += " Received: " + line
       error_msg += "\n\nIf you have a <class_name> with spaces between words you should remove them\n"
-      error_msg += "by running the script \"rename_class.py\" in the \"extra/\" folder."
+      error_msg += "by running the script \"remove_space.py\" or \"rename_class.py\" in the \"extra/\" folder."
       error(error_msg)
     # check if class is in the ignore list, if yes skip
     if class_name in args.ignore:
       continue
     bbox = left + " " + top + " " + right + " " +bottom
-    bounding_boxes.append({"class_name":class_name, "bbox":bbox, "used":False})
-    # count that object
-    if class_name in gt_counter_per_class:
-      gt_counter_per_class[class_name] += 1
+    if is_difficult:
+        bounding_boxes.append({"class_name":class_name, "bbox":bbox, "used":False, "difficult":True})
+        is_difficult = False
     else:
-      # if class didn't exist yet
-      gt_counter_per_class[class_name] = 1
+        bounding_boxes.append({"class_name":class_name, "bbox":bbox, "used":False})
+        # count that object
+        if class_name in gt_counter_per_class:
+          gt_counter_per_class[class_name] += 1
+        else:
+          # if class didn't exist yet
+          gt_counter_per_class[class_name] = 1
   # dump bounding_boxes into a ".json" file
   with open(tmp_files_path + "/" + file_id + "_ground_truth.json", 'w') as outfile:
     json.dump(bounding_boxes, outfile)
@@ -466,7 +475,7 @@ with open(results_files_path + "/results.txt", 'w') as results_file:
               ovmax = ov
               gt_match = obj
 
-      # assign prediction as true positive or false positive
+      # assign prediction as true positive/don't care/false positive
       if show_animation:
         status = "NO MATCH FOUND!" # status is only used in the animation
       # set minimum overlap
@@ -476,21 +485,22 @@ with open(results_files_path + "/results.txt", 'w') as results_file:
           index = specific_iou_classes.index(class_name)
           min_overlap = float(iou_list[index])
       if ovmax >= min_overlap:
-        if not bool(gt_match["used"]):
-          # true positive
-          tp[idx] = 1
-          gt_match["used"] = True
-          count_true_positives[class_name] += 1
-          # update the ".json" file
-          with open(gt_file, 'w') as f:
-              f.write(json.dumps(ground_truth_data))
-          if show_animation:
-            status = "MATCH!"
-        else:
-          # false positive (multiple detection)
-          fp[idx] = 1
-          if show_animation:
-            status = "REPEATED MATCH!"
+        if "difficult" not in gt_match:
+            if not bool(gt_match["used"]):
+              # true positive
+              tp[idx] = 1
+              gt_match["used"] = True
+              count_true_positives[class_name] += 1
+              # update the ".json" file
+              with open(gt_file, 'w') as f:
+                  f.write(json.dumps(ground_truth_data))
+              if show_animation:
+                status = "MATCH!"
+            else:
+              # false positive (multiple detection)
+              fp[idx] = 1
+              if show_animation:
+                status = "REPEATED MATCH!"
       else:
         # false positive
         fp[idx] = 1
