@@ -31,10 +31,10 @@
 
 - ### convert YOLO to our format:
 
-    1) Add class list to the file `class_list.txt`
-    2) Insert predicted objects files into **predicted/**
-    3) Insert images into **images/**
-    4) Run the python script: `python convert_pred_yolo.py`
+    After runnuning darknet on a list of images, e.g.: `darknet.exe detector test data/voc.data yolo-voc.cfg yolo-voc.weights -dont_show -ext_output < data/train.txt > result.txt`
+
+    1) Copy the file `result.txt` to the folder `extra/`
+    2) Run the python script: `python convert_pred_yolo.py`
 
 - ### convert keras-yolo3 to our format:
 
