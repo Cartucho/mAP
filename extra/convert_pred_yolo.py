@@ -30,7 +30,7 @@ with open(IN_FILE) as infile:
             # get all the coordinates of the bounding box
             bbox = bbox.replace(')','') # remove the character ')'
             # go through each of the parts of the string and check if it is a digit
-            left, top, width, height = [int(s) for s in bbox.split() if s.isdigit()]
+            left, top, width, height = [int(s) for s in bbox.split() if s.lstrip('-').isdigit()]
             right = left + width
             bottom = top + height
             outfile.write("{} {} {} {} {} {}\n".format(class_name, float(confidence)/100, left, top, right, bottom))
