@@ -280,6 +280,7 @@ if draw_plot:
   os.makedirs(results_files_path + "/classes")
 if show_animation:
   os.makedirs(results_files_path + "/images")
+  os.makedirs(results_files_path + "/images/single_predictions")
 
 """
  Ground-Truth
@@ -447,6 +448,12 @@ with open(results_files_path + "/results.txt", 'w') as results_file:
           #print(img_path + "/" + ground_truth_img[0])
           # Load image
           img = cv2.imread(img_path + "/" + ground_truth_img[0])
+          # load image with draws of multiple detections
+          img_cumulative_path = results_files_path + "/images/" + ground_truth_img[0]
+          if os.path.isfile(img_cumulative_path):
+            img_cumulative = cv2.imread(img_cumulative_path)
+          else:
+            img_cumulative = img.copy()
           # Add bottom border to image
           bottom_border = 60
           BLACK = [0, 0, 0]
@@ -543,18 +550,24 @@ with open(results_files_path + "/results.txt", 'w') as results_file:
         text = "Result: " + status + " "
         img, line_width = draw_text_in_image(img, text, (margin + line_width, v_pos), color, line_width)
 
+        font = cv2.FONT_HERSHEY_SIMPLEX
         if ovmax > 0: # if there is intersections between the bounding-boxes
-          bbgt = [ float(x) for x in gt_match["bbox"].split() ]
-          cv2.rectangle(img,(int(bbgt[0]),int(bbgt[1])),(int(bbgt[2]),int(bbgt[3])),light_blue,2)
-        if status == "MATCH!":
-          cv2.rectangle(img,(int(bb[0]),int(bb[1])),(int(bb[2]),int(bb[3])),green,2)
-        else:
-          cv2.rectangle(img,(int(bb[0]),int(bb[1])),(int(bb[2]),int(bb[3])),light_red,2)
+          bbgt = [ int(x) for x in gt_match["bbox"].split() ]
+          cv2.rectangle(img,(bbgt[0],bbgt[1]),(bbgt[2],bbgt[3]),light_blue,2)
+          cv2.rectangle(img_cumulative,(bbgt[0],bbgt[1]),(bbgt[2],bbgt[3]),light_blue,2)
+          cv2.putText(img_cumulative, class_name, (bbgt[0],bbgt[1] - 5), font, 0.6, light_blue, 1, cv2.LINE_AA)
+        bb = [int(i) for i in bb]
+        cv2.rectangle(img,(bb[0],bb[1]),(bb[2],bb[3]),color,2)
+        cv2.rectangle(img_cumulative,(bb[0],bb[1]),(bb[2],bb[3]),color,2)
+        cv2.putText(img_cumulative, class_name, (bb[0],bb[1] - 5), font, 0.6, color, 1, cv2.LINE_AA)
+        # show image
         cv2.imshow("Animation", img)
-        cv2.waitKey(20) # show image for 20 ms
+        cv2.waitKey(20) # show for 20 ms
         # save image to results
-        output_img_path = results_files_path + "/images/" + class_name + "_prediction" + str(idx) + ".jpg"
+        output_img_path = results_files_path + "/images/single_predictions/" + class_name + "_prediction" + str(idx) + ".jpg"
         cv2.imwrite(output_img_path, img)
+        # save the image with all the objects drawn to it
+        cv2.imwrite(img_cumulative_path, img_cumulative)
 
     #print(tp)
     # compute precision/recall
