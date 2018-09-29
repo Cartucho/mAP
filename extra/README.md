@@ -31,7 +31,7 @@
 
 - ### convert YOLO to our format:
 
-    After runnuning darknet on a list of images, e.g.: `darknet.exe detector test data/voc.data yolo-voc.cfg yolo-voc.weights -dont_show -ext_output < data/train.txt > result.txt`
+    After runnuning darknet on a list of images, e.g.: `darknet.exe detector test data/voc.data yolo-voc.cfg yolo-voc.weights -dont_show -ext_output < data/test.txt > result.txt`
 
     1) Copy the file `result.txt` to the folder `extra/`
     2) Run the python script: `python convert_pred_yolo.py`
