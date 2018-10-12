@@ -407,7 +407,7 @@ for class_index, class_name in enumerate(gt_classes):
         bounding_boxes.append({"confidence":confidence, "file_id":file_id, "bbox":bbox})
         #print(bounding_boxes)
   # sort predictions by decreasing confidence
-  bounding_boxes.sort(key=lambda x:x['confidence'], reverse=True)
+  bounding_boxes.sort(key=lambda x:float(x['confidence']), reverse=True)
   with open(tmp_files_path + "/" + class_name + "_predictions.json", 'w') as outfile:
     json.dump(bounding_boxes, outfile)
 
