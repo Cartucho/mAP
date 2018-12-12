@@ -526,7 +526,7 @@ with open(results_files_path + "/results.txt", 'w') as results_file:
         light_red = (30,30,255)
         # 1st line
         margin = 10
-        v_pos = int(height - margin - (bottom_border / 2))
+        v_pos = int(height - margin - (bottom_border / 2.0))
         text = "Image: " + ground_truth_img[0] + " "
         img, line_width = draw_text_in_image(img, text, (margin, v_pos), white, 0)
         text = "Class [" + str(class_index) + "/" + str(n_classes) + "]: " + class_name + " "
@@ -540,7 +540,7 @@ with open(results_files_path + "/results.txt", 'w') as results_file:
             color = green
           img, _ = draw_text_in_image(img, text, (margin + line_width, v_pos), color, line_width)
         # 2nd line
-        v_pos += int(bottom_border / 2)
+        v_pos += int(bottom_border / 2.0)
         rank_pos = str(idx+1) # rank position (idx starts at 0)
         text = "Prediction #rank: " + rank_pos + " confidence: {0:.2f}% ".format(float(prediction["confidence"])*100)
         img, line_width = draw_text_in_image(img, text, (margin, v_pos), white, 0)
@@ -552,7 +552,7 @@ with open(results_files_path + "/results.txt", 'w') as results_file:
 
         font = cv2.FONT_HERSHEY_SIMPLEX
         if ovmax > 0: # if there is intersections between the bounding-boxes
-          bbgt = [ int(x) for x in gt_match["bbox"].split() ]
+          bbgt = [ int(round(float(x))) for x in gt_match["bbox"].split() ]
           cv2.rectangle(img,(bbgt[0],bbgt[1]),(bbgt[2],bbgt[3]),light_blue,2)
           cv2.rectangle(img_cumulative,(bbgt[0],bbgt[1]),(bbgt[2],bbgt[3]),light_blue,2)
           cv2.putText(img_cumulative, class_name, (bbgt[0],bbgt[1] - 5), font, 0.6, light_blue, 1, cv2.LINE_AA)
