@@ -17,7 +17,7 @@ parser.add_argument('-np', '--no-plot', help="no plot is shown.", action="store_
 parser.add_argument('-q', '--quiet', help="minimalistic console output.", action="store_true")
 # argparse receiving list of classes to be ignored
 parser.add_argument('-i', '--ignore', nargs='+', type=str, help="ignore a list of classes.")
-# argparse receiving list of classes with specific IoU
+# argparse receiving list of classes with specific IoU (e.g., python main.py --set-class-iou person 0.7)
 parser.add_argument('--set-class-iou', nargs='+', type=str, help="set IoU for a specific class.")
 args = parser.parse_args()
 
@@ -230,7 +230,10 @@ def draw_plot_func(dictionary, n_classes, window_title, plot_title, x_label, out
     # 
     if true_p_bar != "":
         """
-         Special case to draw in (green=true predictions) & (red=false predictions)
+         Special case to draw in:
+            - green -> TP: True Positives (object detected and matches ground-truth)
+            - red -> FP: False Positives (object detected but does not match ground-truth)
+            - orange -> FN: False Negatives (object not detected but present in the ground-truth)
         """
         fp_sorted = []
         tp_sorted = []
@@ -311,11 +314,11 @@ def draw_plot_func(dictionary, n_classes, window_title, plot_title, x_label, out
     plt.close()
 
 """
- Create a "tmp_files/" and "results/" directory
+ Create a ".temp_files/" and "results/" directory
 """
-tmp_files_path = "tmp_files"
-if not os.path.exists(tmp_files_path): # if it doesn't exist already
-    os.makedirs(tmp_files_path)
+TEMP_FILES_PATH = ".temp_files"
+if not os.path.exists(TEMP_FILES_PATH): # if it doesn't exist already
+    os.makedirs(TEMP_FILES_PATH)
 results_files_path = "results"
 if os.path.exists(results_files_path): # if it exist already
     # reset the results directory
@@ -396,7 +399,7 @@ for txt_file in ground_truth_files_list:
 
 
     # dump bounding_boxes into a ".json" file
-    with open(tmp_files_path + "/" + file_id + "_ground_truth.json", 'w') as outfile:
+    with open(TEMP_FILES_PATH + "/" + file_id + "_ground_truth.json", 'w') as outfile:
         json.dump(bounding_boxes, outfile)
 
 gt_classes = list(gt_counter_per_class.keys())
@@ -466,7 +469,7 @@ for class_index, class_name in enumerate(gt_classes):
                 #print(bounding_boxes)
     # sort predictions by decreasing confidence
     bounding_boxes.sort(key=lambda x:float(x['confidence']), reverse=True)
-    with open(tmp_files_path + "/" + class_name + "_predictions.json", 'w') as outfile:
+    with open(TEMP_FILES_PATH + "/" + class_name + "_predictions.json", 'w') as outfile:
         json.dump(bounding_boxes, outfile)
 
 """
@@ -484,7 +487,7 @@ with open(results_files_path + "/results.txt", 'w') as results_file:
         """
          Load predictions of that class
         """
-        predictions_file = tmp_files_path + "/" + class_name + "_predictions.json"
+        predictions_file = TEMP_FILES_PATH + "/" + class_name + "_predictions.json"
         predictions_data = json.load(open(predictions_file))
 
         """
@@ -519,7 +522,7 @@ with open(results_files_path + "/results.txt", 'w') as results_file:
                     img = cv2.copyMakeBorder(img, 0, bottom_border, 0, 0, cv2.BORDER_CONSTANT, value=BLACK)
             # assign prediction to ground truth object if any
             # open ground-truth with that file_id
-            gt_file = tmp_files_path + "/" + file_id + "_ground_truth.json"
+            gt_file = TEMP_FILES_PATH + "/" + file_id + "_ground_truth.json"
             ground_truth_data = json.load(open(gt_file))
             ovmax = -1
             gt_match = -1
@@ -706,8 +709,8 @@ with open(results_files_path + "/results.txt", 'w') as results_file:
     results_file.write(text + "\n")
     print(text)
 
-# remove the tmp_files directory
-shutil.rmtree(tmp_files_path)
+# remove the temp_files directory
+shutil.rmtree(TEMP_FILES_PATH)
 
 """
  Count total of Predictions
@@ -786,7 +789,7 @@ if draw_plot:
     # end Plot title
     x_label = "Number of objects per class"
     output_path = results_files_path + "/Predicted Objects Info.png"
-    to_show = False
+    to_show = True
     plot_color = 'forestgreen'
     true_p_bar = count_true_positives
     draw_plot_func(
