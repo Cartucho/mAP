@@ -788,7 +788,7 @@ if draw_plot:
     # end Plot title
     x_label = "Number of objects per class"
     output_path = results_files_path + "/Predicted Objects Info.png"
-    to_show = True
+    to_show = False
     plot_color = 'forestgreen'
     true_p_bar = count_true_positives
     draw_plot_func(
