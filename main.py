@@ -651,7 +651,7 @@ with open(results_files_path + "/results.txt", 'w') as results_file:
             prec[idx] = float(tp[idx]) / (fp[idx] + tp[idx])
         #print(prec)
 
-        ap, mrec, mprec = voc_ap(rec, prec)
+        ap, mrec, mprec = voc_ap(rec[:], prec[:])
         sum_AP += ap
         text = "{0:.2f}%".format(ap*100) + " = " + class_name + " AP " #class_name + " AP = {0:.2f}%".format(ap*100)
         """
@@ -664,9 +664,8 @@ with open(results_files_path + "/results.txt", 'w') as results_file:
             print(text)
         ap_dictionary[class_name] = ap
 
-        # TODO n_images = number of images with ground-truth objects for this class
         n_images = counter_images_per_class[class_name]
-        lamr, mr, fppi = log_average_miss_rate(np.array(prec), np.array(fp), n_images)
+        lamr, mr, fppi = log_average_miss_rate(np.array(rec), np.array(fp), n_images)
         lamr_dictionary[class_name] = lamr
 
         """
