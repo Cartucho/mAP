@@ -1,8 +1,17 @@
 import os
 import re
 
+# make sure that the cwd() in the beginning is the location of the python script (so that every path makes sense)
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
+
 IN_FILE = 'result.txt'
-OUTPUT_DIR = os.path.join('..', 'predicted')
+
+# change directory to the one with the files to be changed
+parent_path = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+parent_path = os.path.abspath(os.path.join(parent_path, os.pardir))
+DR_PATH = os.path.join(parent_path, 'input','predicted')
+#print(DR_PATH)
+os.chdir(DR_PATH)
 
 SEPARATOR_KEY = 'Enter Image Path:'
 IMG_FORMAT = '.jpg'
@@ -22,7 +31,7 @@ with open(IN_FILE) as infile:
             if outfile is not None:
                 outfile.close()
             # open a new file
-            outfile = open(os.path.join(OUTPUT_DIR, image_name + '.txt'), 'w')
+            outfile = open(os.path.join(DR_PATH, image_name + '.txt'), 'w')
         elif outfile is not None:
             # split line on first occurrence of the character ':' and '%'
             class_name, info = line.split(':', 1)

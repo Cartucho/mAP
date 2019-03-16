@@ -2,6 +2,9 @@ import sys
 import os
 import glob
 
+# make sure that the cwd() in the beginning is the location of the python script (so that every path makes sense)
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
+
 if len(sys.argv) != 2:
   print("Error: wrong format.\nUsage: python find_class.py [class_name]")
   sys.exit(0)
@@ -29,9 +32,14 @@ def find_class(class_name):
   if not file_found:
     print(" No file found with that class")
 
+parent_path = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+parent_path = os.path.abspath(os.path.join(parent_path, os.pardir))
+GT_PATH = os.path.join(parent_path, 'input','ground-truth')
+DR_PATH = os.path.join(parent_path, 'input','predicted')
+
 print("Ground-Truth folder:")
-os.chdir("../ground-truth")
+os.chdir(GT_PATH)
 find_class(searching_class_name)
 print("\nPredicted folder:")
-os.chdir("../predicted")
+os.chdir(DR_PATH)
 find_class(searching_class_name)

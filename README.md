@@ -1,6 +1,5 @@
 # mAP (mean Average Precision)
 
-[![New](https://img.shields.io/badge/2018-NEW-brightgreen.svg)](https://github.com/Cartucho/mAP/commits/master)
 [![GitHub stars](https://img.shields.io/github/stars/Cartucho/mAP.svg?style=social&label=Stars)](https://github.com/Cartucho/mAP)
 
 This code will evaluate the performance of your neural net for object recognition.
@@ -74,9 +73,9 @@ git clone https://github.com/Cartucho/mAP
 Step by step:
 
   1. [Create the ground-truth files](#create-the-ground-truth-files)
-  2. Move the ground-truth files into the folder **ground-truth/**
-  3. [Create the predicted objects files](#create-the-predicted-objects-files)
-  4. Move the predictions files into the folder **predicted/**
+  2. Copy the ground-truth files into the folder **input/ground-truth/**
+  3. [Create the detection-result files](#create-the-detection-result-files)
+  4. Copy the detection-result files into the folder **input/predicted/**
   5. Run the code:
          ```
          python main.py
@@ -84,22 +83,22 @@ Step by step:
 
 Optional (if you want to see the **animation**):
 
-  6. Insert the images into the folder **images/**
+  6. Insert the images into the folder **input/images/**
 
 
 #### PASCAL VOC, Darkflow and YOLO users
 
-In the [extra](https://github.com/Cartucho/mAP/tree/master/extra) folder you can find additional scripts to convert **PASCAL VOC**, **darkflow** and **YOLO** files into the required format.
+In the [scripts/extra](https://github.com/Cartucho/mAP/tree/master/scripts/extra) folder you can find additional scripts to convert **PASCAL VOC**, **darkflow** and **YOLO** files into the required format.
 
 #### Create the ground-truth files
 
 - Create a separate ground-truth text file for each image.
-- Use **matching names** (e.g. image: "image_1.jpg", ground-truth: "image_1.txt"; "image_2.jpg", "image_2.txt"...).
+- Use **matching names** for the files (e.g. image: "image_1.jpg", ground-truth: "image_1.txt").
 - In these files, each line should be in the following format:
     ```
     <class_name> <left> <top> <right> <bottom> [<difficult>]
     ```
-- The `difficult` parameter is optional, use it if you want to ignore a specific prediction.
+- The `difficult` parameter is optional, use it if you want the calculation to ignore a specific detection.
 - E.g. "image_1.txt":
     ```
     tvmonitor 2 10 173 238
@@ -107,10 +106,11 @@ In the [extra](https://github.com/Cartucho/mAP/tree/master/extra) folder you can
     book 437 246 518 351 difficult
     pottedplant 272 190 316 259
     ```
-#### Create the predicted objects files
 
-- Create a separate predicted objects text file for each image.
-- Use **matching names** (e.g. image: "image_1.jpg", predicted: "image_1.txt"; "image_2.jpg", "image_2.txt"...).
+#### Create the detection-result files
+
+- Create a separate detection-result text file for each image.
+- Use **matching names** for the files (e.g. image: "image_1.jpg", detection-result: "image_1.txt").
 - In these files, each line should be in the following format:
     ```
     <class_name> <confidence> <left> <top> <right> <bottom>

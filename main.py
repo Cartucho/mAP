@@ -21,6 +21,18 @@ parser.add_argument('-i', '--ignore', nargs='+', type=str, help="ignore a list o
 parser.add_argument('--set-class-iou', nargs='+', type=str, help="set IoU for a specific class.")
 args = parser.parse_args()
 
+'''
+    0,0 ------> x (width)
+     |
+     |  (Left,Top)
+     |      *_________
+     |      |         |
+            |         |
+     y      |_________|
+  (height)            *
+                (Right,Bottom)
+'''
+
 # if there are no classes to ignore then replace None by empty list
 if args.ignore is None:
     args.ignore = []
@@ -29,10 +41,15 @@ specific_iou_flagged = False
 if args.set_class_iou is not None:
     specific_iou_flagged = True
 
+# make sure that the cwd() is the location of the python script (so that every path makes sense)
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
+
+GT_PATH = os.path.join(os.getcwd(), 'input', 'ground-truth')
+DR_PATH = os.path.join(os.getcwd(), 'input', 'predicted')
 # if there are no images then no animation can be shown
-img_path = 'images'
-if os.path.exists(img_path): 
-    for dirpath, dirnames, files in os.walk(img_path):
+IMG_PATH = os.path.join(os.getcwd(), 'input', 'images')
+if os.path.exists(IMG_PATH): 
+    for dirpath, dirnames, files in os.walk(IMG_PATH):
         if not files:
             # no image files found
             args.no_animation = True
@@ -337,7 +354,7 @@ if show_animation:
      Create a list of all the class names present in the ground-truth (gt_classes).
 """
 # get a list with the ground-truth files
-ground_truth_files_list = glob.glob('ground-truth/*.txt')
+ground_truth_files_list = glob.glob(GT_PATH + '/*.txt')
 if len(ground_truth_files_list) == 0:
     error("Error: No ground-truth files found!")
 ground_truth_files_list.sort()
@@ -347,11 +364,12 @@ counter_images_per_class = {}
 
 for txt_file in ground_truth_files_list:
     #print(txt_file)
-    file_id = txt_file.split(".txt",1)[0]
+    file_id = txt_file.split(".txt", 1)[0]
     file_id = os.path.basename(os.path.normpath(file_id))
     # check if there is a correspondent predicted objects file
-    if not os.path.exists('predicted/' + file_id + ".txt"):
-        error_msg = "Error. File not found: predicted/" + file_id + ".txt\n"
+    temp_path = os.path.join(DR_PATH, (file_id + ".txt"))
+    if not os.path.exists(temp_path):
+        error_msg = "Error. File not found: {}\n".format(temp_path)
         error_msg += "(You can avoid this error message by running extra/intersect-gt-and-pred.py)"
         error(error_msg)
     lines_list = file_lines_to_list(txt_file)
@@ -438,7 +456,7 @@ if specific_iou_flagged:
      Load each of the predicted files into a temporary ".json" file.
 """
 # get a list with the predicted files
-predicted_files_list = glob.glob('predicted/*.txt')
+predicted_files_list = glob.glob(DR_PATH + '/*.txt')
 predicted_files_list.sort()
 
 for class_index, class_name in enumerate(gt_classes):
@@ -448,9 +466,10 @@ for class_index, class_name in enumerate(gt_classes):
         # the first time it checks if all the corresponding ground-truth files exist
         file_id = txt_file.split(".txt",1)[0]
         file_id = os.path.basename(os.path.normpath(file_id))
+        temp_path = os.path.join(GT_PATH, (file_id + ".txt"))
         if class_index == 0:
-            if not os.path.exists('ground-truth/' + file_id + ".txt"):
-                error_msg = "Error. File not found: ground-truth/" +    file_id + ".txt\n"
+            if not os.path.exists(temp_path):
+                error_msg = "Error. File not found: {}\n".format(temp_path)
                 error_msg += "(You can avoid this error message by running extra/intersect-gt-and-pred.py)"
                 error(error_msg)
         lines = file_lines_to_list(txt_file)
@@ -500,16 +519,16 @@ with open(results_files_path + "/results.txt", 'w') as results_file:
             file_id = prediction["file_id"]
             if show_animation:
                 # find ground truth image
-                ground_truth_img = glob.glob1(img_path, file_id + ".*")
+                ground_truth_img = glob.glob1(IMG_PATH, file_id + ".*")
                 #tifCounter = len(glob.glob1(myPath,"*.tif"))
                 if len(ground_truth_img) == 0:
                     error("Error. Image not found with id: " + file_id)
                 elif len(ground_truth_img) > 1:
                     error("Error. Multiple image with id: " + file_id)
                 else: # found image
-                    #print(img_path + "/" + ground_truth_img[0])
+                    #print(IMG_PATH + "/" + ground_truth_img[0])
                     # Load image
-                    img = cv2.imread(img_path + "/" + ground_truth_img[0])
+                    img = cv2.imread(IMG_PATH + "/" + ground_truth_img[0])
                     # load image with draws of multiple detections
                     img_cumulative_path = results_files_path + "/images/" + ground_truth_img[0]
                     if os.path.isfile(img_cumulative_path):

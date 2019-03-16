@@ -3,11 +3,15 @@ import os
 import glob
 import json
 
+# make sure that the cwd() in the beginning is the location of the python script (so that every path makes sense)
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 # change directory to the one with the files to be changed
-path_to_folder = '../predicted'
-#print(path_to_folder)
-os.chdir(path_to_folder)
+parent_path = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+parent_path = os.path.abspath(os.path.join(parent_path, os.pardir))
+DR_PATH = os.path.join(parent_path, 'input','predicted')
+#print(DR_PATH)
+os.chdir(DR_PATH)
 
 # old files (darkflow json format) will be moved to a "backup" folder
 ## create the backup dir if it doesn't exist already

@@ -3,7 +3,6 @@ import os
 import glob
 import cv2
 
-
 def convert_yolo_coordinates_to_voc(x_c_n, y_c_n, width_n, height_n, img_width, img_height):
   ## remove normalization given the size of the image
   x_c = float(x_c_n) * img_width
@@ -21,6 +20,9 @@ def convert_yolo_coordinates_to_voc(x_c_n, y_c_n, width_n, height_n, img_width, 
   bottom = int(y_c + half_height) + 1
   return left, top, right, bottom
 
+# make sure that the cwd() in the beginning is the location of the python script (so that every path makes sense)
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
+
 # read the class_list.txt to a list
 with open("class_list.txt") as f:
   obj_list = f.readlines()
@@ -30,9 +32,11 @@ with open("class_list.txt") as f:
 #print(obj_list[0])
 
 # change directory to the one with the files to be changed
-path_to_folder = '../ground-truth'
-#print(path_to_folder)
-os.chdir(path_to_folder)
+parent_path = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+parent_path = os.path.abspath(os.path.join(parent_path, os.pardir))
+GT_PATH = os.path.join(parent_path, 'input','ground-truth')
+#print(GT_PATH)
+os.chdir(GT_PATH)
 
 # old files (YOLO format) will be moved to a new folder (backup/)
 ## create the backup dir if it doesn't exist already
