@@ -45,9 +45,9 @@ if args.set_class_iou is not None:
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 GT_PATH = os.path.join(os.getcwd(), 'input', 'ground-truth')
-DR_PATH = os.path.join(os.getcwd(), 'input', 'predicted')
+DR_PATH = os.path.join(os.getcwd(), 'input', 'detection-results')
 # if there are no images then no animation can be shown
-IMG_PATH = os.path.join(os.getcwd(), 'input', 'images')
+IMG_PATH = os.path.join(os.getcwd(), 'input', 'images-optional')
 if os.path.exists(IMG_PATH): 
     for dirpath, dirnames, files in os.walk(IMG_PATH):
         if not files:
@@ -257,8 +257,8 @@ def draw_plot_func(dictionary, n_classes, window_title, plot_title, x_label, out
         for key in sorted_keys:
             fp_sorted.append(dictionary[key] - true_p_bar[key])
             tp_sorted.append(true_p_bar[key])
-        plt.barh(range(n_classes), fp_sorted, align='center', color='crimson', label='False Predictions')
-        plt.barh(range(n_classes), tp_sorted, align='center', color='forestgreen', label='True Predictions', left=fp_sorted)
+        plt.barh(range(n_classes), fp_sorted, align='center', color='crimson', label='False Positive')
+        plt.barh(range(n_classes), tp_sorted, align='center', color='forestgreen', label='True Positive', left=fp_sorted)
         # add legend
         plt.legend(loc='lower right')
         """
@@ -343,13 +343,12 @@ if os.path.exists(results_files_path): # if it exist already
 
 os.makedirs(results_files_path)
 if draw_plot:
-    os.makedirs(results_files_path + "/classes")
+    os.makedirs(os.path.join(results_files_path, "classes"))
 if show_animation:
-    os.makedirs(results_files_path + "/images")
-    os.makedirs(results_files_path + "/images/single_predictions")
+    os.makedirs(os.path.join(results_files_path, "images", "detections_one_by_one"))
 
 """
- Ground-Truth
+ ground-truth
      Load each of the ground-truth files into a temporary ".json" file.
      Create a list of all the class names present in the ground-truth (gt_classes).
 """
@@ -366,11 +365,11 @@ for txt_file in ground_truth_files_list:
     #print(txt_file)
     file_id = txt_file.split(".txt", 1)[0]
     file_id = os.path.basename(os.path.normpath(file_id))
-    # check if there is a correspondent predicted objects file
+    # check if there is a correspondent detection-results file
     temp_path = os.path.join(DR_PATH, (file_id + ".txt"))
     if not os.path.exists(temp_path):
         error_msg = "Error. File not found: {}\n".format(temp_path)
-        error_msg += "(You can avoid this error message by running extra/intersect-gt-and-pred.py)"
+        error_msg += "(You can avoid this error message by running extra/intersect-gt-and-dr.py)"
         error(error_msg)
     lines_list = file_lines_to_list(txt_file)
     # create ground-truth dictionary
@@ -452,16 +451,16 @@ if specific_iou_flagged:
             error('Error, IoU must be between 0.0 and 1.0. Flag usage:' + error_msg)
 
 """
- Predicted
-     Load each of the predicted files into a temporary ".json" file.
+ detection-results
+     Load each of the detection-results files into a temporary ".json" file.
 """
-# get a list with the predicted files
-predicted_files_list = glob.glob(DR_PATH + '/*.txt')
-predicted_files_list.sort()
+# get a list with the detection-results files
+dr_files_list = glob.glob(DR_PATH + '/*.txt')
+dr_files_list.sort()
 
 for class_index, class_name in enumerate(gt_classes):
     bounding_boxes = []
-    for txt_file in predicted_files_list:
+    for txt_file in dr_files_list:
         #print(txt_file)
         # the first time it checks if all the corresponding ground-truth files exist
         file_id = txt_file.split(".txt",1)[0]
@@ -470,7 +469,7 @@ for class_index, class_name in enumerate(gt_classes):
         if class_index == 0:
             if not os.path.exists(temp_path):
                 error_msg = "Error. File not found: {}\n".format(temp_path)
-                error_msg += "(You can avoid this error message by running extra/intersect-gt-and-pred.py)"
+                error_msg += "(You can avoid this error message by running extra/intersect-gt-and-dr.py)"
                 error(error_msg)
         lines = file_lines_to_list(txt_file)
         for line in lines:
@@ -486,9 +485,9 @@ for class_index, class_name in enumerate(gt_classes):
                 bbox = left + " " + top + " " + right + " " +bottom
                 bounding_boxes.append({"confidence":confidence, "file_id":file_id, "bbox":bbox})
                 #print(bounding_boxes)
-    # sort predictions by decreasing confidence
+    # sort detection-results by decreasing confidence
     bounding_boxes.sort(key=lambda x:float(x['confidence']), reverse=True)
-    with open(TEMP_FILES_PATH + "/" + class_name + "_predictions.json", 'w') as outfile:
+    with open(TEMP_FILES_PATH + "/" + class_name + "_dr.json", 'w') as outfile:
         json.dump(bounding_boxes, outfile)
 
 """
@@ -504,19 +503,19 @@ with open(results_files_path + "/results.txt", 'w') as results_file:
     for class_index, class_name in enumerate(gt_classes):
         count_true_positives[class_name] = 0
         """
-         Load predictions of that class
+         Load detection-results of that class
         """
-        predictions_file = TEMP_FILES_PATH + "/" + class_name + "_predictions.json"
-        predictions_data = json.load(open(predictions_file))
+        dr_file = TEMP_FILES_PATH + "/" + class_name + "_dr.json"
+        dr_data = json.load(open(dr_file))
 
         """
-         Assign predictions to ground truth objects
+         Assign detection-results to ground-truth objects
         """
-        nd = len(predictions_data)
+        nd = len(dr_data)
         tp = [0] * nd # creates an array of zeros of size nd
         fp = [0] * nd
-        for idx, prediction in enumerate(predictions_data):
-            file_id = prediction["file_id"]
+        for idx, detection in enumerate(dr_data):
+            file_id = detection["file_id"]
             if show_animation:
                 # find ground truth image
                 ground_truth_img = glob.glob1(IMG_PATH, file_id + ".*")
@@ -539,14 +538,14 @@ with open(results_files_path + "/results.txt", 'w') as results_file:
                     bottom_border = 60
                     BLACK = [0, 0, 0]
                     img = cv2.copyMakeBorder(img, 0, bottom_border, 0, 0, cv2.BORDER_CONSTANT, value=BLACK)
-            # assign prediction to ground truth object if any
+            # assign detection-results to ground truth object if any
             # open ground-truth with that file_id
             gt_file = TEMP_FILES_PATH + "/" + file_id + "_ground_truth.json"
             ground_truth_data = json.load(open(gt_file))
             ovmax = -1
             gt_match = -1
-            # load prediction bounding-box
-            bb = [ float(x) for x in prediction["bbox"].split() ]
+            # load detected object bounding-box
+            bb = [ float(x) for x in detection["bbox"].split() ]
             for obj in ground_truth_data:
                 # look for a class_name match
                 if obj["class_name"] == class_name:
@@ -563,7 +562,7 @@ with open(results_files_path + "/results.txt", 'w') as results_file:
                             ovmax = ov
                             gt_match = obj
 
-            # assign prediction as true positive/don't care/false positive
+            # assign detection as true positive/don't care/false positive
             if show_animation:
                 status = "NO MATCH FOUND!" # status is only used in the animation
             # set minimum overlap
@@ -623,7 +622,7 @@ with open(results_files_path + "/results.txt", 'w') as results_file:
                 # 2nd line
                 v_pos += int(bottom_border / 2.0)
                 rank_pos = str(idx+1) # rank position (idx starts at 0)
-                text = "Prediction #rank: " + rank_pos + " confidence: {0:.2f}% ".format(float(prediction["confidence"])*100)
+                text = "Detection #rank: " + rank_pos + " confidence: {0:.2f}% ".format(float(detection["confidence"])*100)
                 img, line_width = draw_text_in_image(img, text, (margin, v_pos), white, 0)
                 color = light_red
                 if status == "MATCH!":
@@ -645,7 +644,7 @@ with open(results_files_path + "/results.txt", 'w') as results_file:
                 cv2.imshow("Animation", img)
                 cv2.waitKey(20) # show for 20 ms
                 # save image to results
-                output_img_path = results_files_path + "/images/single_predictions/" + class_name + "_prediction" + str(idx) + ".jpg"
+                output_img_path = results_files_path + "/images/detections_one_by_one/" + class_name + "_detection" + str(idx) + ".jpg"
                 cv2.imwrite(output_img_path, img)
                 # save the image with all the objects drawn to it
                 cv2.imwrite(img_cumulative_path, img_cumulative)
@@ -731,12 +730,11 @@ with open(results_files_path + "/results.txt", 'w') as results_file:
 shutil.rmtree(TEMP_FILES_PATH)
 
 """
- Count total of Predictions
+ Count total of detection-results
 """
 # iterate through all the files
-pred_counter_per_class = {}
-#all_classes_predicted_files = set([])
-for txt_file in predicted_files_list:
+det_counter_per_class = {}
+for txt_file in dr_files_list:
     # get lines to list
     lines_list = file_lines_to_list(txt_file)
     for line in lines_list:
@@ -745,24 +743,24 @@ for txt_file in predicted_files_list:
         if class_name in args.ignore:
             continue
         # count that object
-        if class_name in pred_counter_per_class:
-            pred_counter_per_class[class_name] += 1
+        if class_name in det_counter_per_class:
+            det_counter_per_class[class_name] += 1
         else:
             # if class didn't exist yet
-            pred_counter_per_class[class_name] = 1
-#print(pred_counter_per_class)
-pred_classes = list(pred_counter_per_class.keys())
+            det_counter_per_class[class_name] = 1
+#print(det_counter_per_class)
+dr_classes = list(det_counter_per_class.keys())
 
 
 """
  Plot the total number of occurences of each class in the ground-truth
 """
 if draw_plot:
-    window_title = "Ground-Truth Info"
-    plot_title = "Ground-Truth\n"
+    window_title = "ground-truth-info"
+    plot_title = "ground-truth\n"
     plot_title += "(" + str(len(ground_truth_files_list)) + " files and " + str(n_classes) + " classes)"
     x_label = "Number of objects per class"
-    output_path = results_files_path + "/Ground-Truth Info.png"
+    output_path = results_files_path + "/ground-truth-info.png"
     to_show = False
     plot_color = 'forestgreen'
     draw_plot_func(
@@ -788,31 +786,31 @@ with open(results_files_path + "/results.txt", 'a') as results_file:
 """
  Finish counting true positives
 """
-for class_name in pred_classes:
-    # if class exists in predictions but not in ground-truth then there are no true positives in that class
+for class_name in dr_classes:
+    # if class exists in detection-result but not in ground-truth then there are no true positives in that class
     if class_name not in gt_classes:
         count_true_positives[class_name] = 0
 #print(count_true_positives)
 
 """
- Plot the total number of occurences of each class in the "predicted" folder
+ Plot the total number of occurences of each class in the "detection-results" folder
 """
 if draw_plot:
-    window_title = "Predicted Objects Info"
+    window_title = "detection-results-info"
     # Plot title
-    plot_title = "Predicted Objects\n"
-    plot_title += "(" + str(len(predicted_files_list)) + " files and "
-    count_non_zero_values_in_dictionary = sum(int(x) > 0 for x in list(pred_counter_per_class.values()))
+    plot_title = "detection-results\n"
+    plot_title += "(" + str(len(dr_files_list)) + " files and "
+    count_non_zero_values_in_dictionary = sum(int(x) > 0 for x in list(det_counter_per_class.values()))
     plot_title += str(count_non_zero_values_in_dictionary) + " detected classes)"
     # end Plot title
     x_label = "Number of objects per class"
-    output_path = results_files_path + "/Predicted Objects Info.png"
+    output_path = results_files_path + "/detection-results-info.png"
     to_show = False
     plot_color = 'forestgreen'
     true_p_bar = count_true_positives
     draw_plot_func(
-        pred_counter_per_class,
-        len(pred_counter_per_class),
+        det_counter_per_class,
+        len(det_counter_per_class),
         window_title,
         plot_title,
         x_label,
@@ -823,15 +821,15 @@ if draw_plot:
         )
 
 """
- Write number of predicted objects per class to results.txt
+ Write number of detected objects per class to results.txt
 """
 with open(results_files_path + "/results.txt", 'a') as results_file:
-    results_file.write("\n# Number of predicted objects per class\n")
-    for class_name in sorted(pred_classes):
-        n_pred = pred_counter_per_class[class_name]
-        text = class_name + ": " + str(n_pred)
+    results_file.write("\n# Number of detected objects per class\n")
+    for class_name in sorted(dr_classes):
+        n_det = det_counter_per_class[class_name]
+        text = class_name + ": " + str(n_det)
         text += " (tp:" + str(count_true_positives[class_name]) + ""
-        text += ", fp:" + str(n_pred - count_true_positives[class_name]) + ")\n"
+        text += ", fp:" + str(n_det - count_true_positives[class_name]) + ")\n"
         results_file.write(text)
 
 """
@@ -877,4 +875,3 @@ if draw_plot:
         plot_color,
         ""
         )
-

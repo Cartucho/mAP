@@ -9,7 +9,7 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 # change directory to the one with the files to be changed
 parent_path = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 parent_path = os.path.abspath(os.path.join(parent_path, os.pardir))
-DR_PATH = os.path.join(parent_path, 'input','predicted')
+DR_PATH = os.path.join(parent_path, 'input','detection-results')
 #print(DR_PATH)
 os.chdir(DR_PATH)
 
@@ -21,7 +21,7 @@ if not os.path.exists("backup"):
 # create VOC format files
 json_list = glob.glob('*.json')
 if len(json_list) == 0:
-  print("Error: no .json files found in predicted")
+  print("Error: no .json files found in detection-results")
   sys.exit()
 for tmp_file in json_list:
   #print(tmp_file)

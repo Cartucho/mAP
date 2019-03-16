@@ -27,7 +27,7 @@ First (**1.**), we calculate the Average Precision (AP), for each of the classes
 
 For each class:
 
-First, your neural net **predicted objects** are sorted by decreasing confidence and are assigned to **ground-truth objects**. We have "a match" when they share the **same label and an IoU >= 0.5** (Intersection over Union greater than 50%). This "match" is considered a true positive if that ground-truth object has not been already used (to avoid multiple detections of the same object). 
+First, your neural net **detection-results** are sorted by decreasing confidence and are assigned to **ground-truth objects**. We have "a match" when they share the **same label and an IoU >= 0.5** (Intersection over Union greater than 50%). This "match" is considered a true positive if that ground-truth object has not been already used (to avoid multiple detections of the same object). 
 
 <img src="https://user-images.githubusercontent.com/15831541/37725175-45b9e1a6-2d2a-11e8-8c15-2fb4d716ca9a.png" width="35%" height="35%" />
 
@@ -74,8 +74,8 @@ Step by step:
 
   1. [Create the ground-truth files](#create-the-ground-truth-files)
   2. Copy the ground-truth files into the folder **input/ground-truth/**
-  3. [Create the detection-result files](#create-the-detection-result-files)
-  4. Copy the detection-result files into the folder **input/predicted/**
+  3. [Create the detection-results files](#create-the-detection-results-files)
+  4. Copy the detection-results files into the folder **input/detection-results/**
   5. Run the code:
          ```
          python main.py
@@ -107,10 +107,10 @@ In the [scripts/extra](https://github.com/Cartucho/mAP/tree/master/scripts/extra
     pottedplant 272 190 316 259
     ```
 
-#### Create the detection-result files
+#### Create the detection-results files
 
-- Create a separate detection-result text file for each image.
-- Use **matching names** for the files (e.g. image: "image_1.jpg", detection-result: "image_1.txt").
+- Create a separate detection-results text file for each image.
+- Use **matching names** for the files (e.g. image: "image_1.jpg", detection-results: "image_1.txt").
 - In these files, each line should be in the following format:
     ```
     <class_name> <confidence> <left> <top> <right> <bottom>

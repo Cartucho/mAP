@@ -4,7 +4,7 @@ Converts ground-truth from the annotation files
 according to the https://github.com/qqwweee/keras-yolo3
 or https://github.com/gustavovaliati/keras-yolo3 format.
 
-And converts the predicitons from the annotation files
+And converts the detection-results from the annotation files
 according to the https://github.com/gustavovaliati/keras-yolo3 format.
 '''
 
@@ -36,17 +36,17 @@ group.add_argument('--gt',
     type=str,
     default=None,
     help="The annotation file that refers to ground-truth in (keras-yolo3 format)")
-group.add_argument('--pred',
+group.add_argument('--dr',
     type=str,
     default=None,
-    help="The annotation file that refers to predictions in (keras-yolo3 format)")
+    help="The annotation file that refers to detection-results in (keras-yolo3 format)")
 
 ARGS = ap.parse_args()
 
 with open('class_list.txt', 'r') as class_file:
     class_map = class_file.readlines()
 print(class_map)
-annotation_file = ARGS.gt if ARGS.gt else ARGS.pred
+annotation_file = ARGS.gt if ARGS.gt else ARGS.dr
 
 os.makedirs(ARGS.output_path, exist_ok=True)
 
@@ -79,7 +79,7 @@ with open(annotation_file, 'r') as annot_f:
                     out_box = '{} {} {} {} {}'.format(
                         class_map[int(class_id)].strip(), x_min, y_min, x_max, y_max)
                 else:
-                    # Here we are dealing with predictions annotations
+                    # Here we are dealing with detection-results annotations
                     # <class_name> <confidence> <left> <top> <right> <bottom>
                     x_min, y_min, x_max, y_max, class_id, score = list(map(float, bbox.split(',')))
                     out_box = '{} {} {} {} {} {}'.format(
