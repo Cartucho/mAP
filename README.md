@@ -83,7 +83,7 @@ Step by step:
 
 Optional (if you want to see the **animation**):
 
-  6. Insert the images into the folder **input/images/**
+  6. Insert the images into the folder **input/images-optional/**
 
 
 #### PASCAL VOC, Darkflow and YOLO users
