@@ -845,7 +845,7 @@ if draw_plot:
     plot_title = "mAP = {0:.2f}%".format(mAP*100)
     x_label = "Average Precision"
     output_path = results_files_path + "/mAP.png"
-    to_show = True
+    to_show = False
     plot_color = 'royalblue'
     draw_plot_func(
         ap_dictionary,
