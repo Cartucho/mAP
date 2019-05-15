@@ -37,5 +37,5 @@ for tmp_file in xml_list:
       bottom = bndbox.find('ymax').text
       new_f.write("%s %s %s %s %s\n" % (obj_name, left, top, right, bottom))
   # 2. move old file (xml format) to backup
-  os.rename(tmp_file, os.path.join(backup, tmp_file))
+  os.rename(tmp_file, os.path.join("backup", tmp_file))
 print("Conversion completed!")
