@@ -2,18 +2,15 @@
 
 [![GitHub stars](https://img.shields.io/github/stars/Cartucho/mAP.svg?style=social&label=Stars)](https://github.com/Cartucho/mAP)
 
-This python code will evaluate the performance of your **object detector**. All the documentation is in the `docs/` directory and online at TODO add link to Read the Docs.
+This python code will evaluate the performance of your **object detector**. All the documentation is in the `docs/` directory and online at (TODO: add link to Read the Docs).
 
 <p align="center">
   <img src="https://user-images.githubusercontent.com/15831541/37559643-6738bcc8-2a21-11e8-8a07-ed836f19c5d9.gif" width="450" height="300" />
 </p>
 
-The uniqueness of this tool is the visualization of your data.
+The uniqueness of this tool is that it allows you to quick and easily visualize your results. This allows you to understand how good your object detector really is and when is it failing.
 
-In practice, a higher mAP value indicates a better performance of your neural net given your ground-truth and set of classes.
-The mAP score is not enough since usually we can get a better mAP score by lowering the threshold which leads to more false positives.
-
-Therefore, the **goal of this repo** is not only to calculate the mAP score but also to calculate other metrics like *ROC curves*, *confusion matrix*, *log average miss-rate*, *precision*, *recall*, and many more! We also provide you means to visualize what is going on and better understand how good your object detector really is.
+In practice, a higher mAP value indicates a better performance of your neural-network. However, the mAP score is not enough. Therefore, the **goal of this repo** is not only to calculate the mAP score but also other metrics like *ROC curve*, *confusion matrix*, *log average miss-rate* and others!
 
 ## Latest Features
 
@@ -31,9 +28,9 @@ Therefore, the **goal of this repo** is not only to calculate the mAP score but 
 - [Authors](#authors)
 
 ## Theoretical Explanation
-Currently the most used metric to evaluate an object detector in the literature is the mAP score. In specific, the mAP criterium defined in the [PASCAL VOC 2012 competition](http://host.robots.ox.ac.uk/pascal/VOC/voc2012/). This project started from an adaptation of the [official Matlab code](http://host.robots.ox.ac.uk/pascal/VOC/voc2012/#devkit) into Python.
+Currently the most used metric to evaluate an object detector in the literature is the mAP score. In specific, the mAP criterion defined in the [PASCAL VOC 2012 competition](http://host.robots.ox.ac.uk/pascal/VOC/voc2012/). This project started from an adaptation of the [official Matlab code](http://host.robots.ox.ac.uk/pascal/VOC/voc2012/#devkit) into Python.
 
-To calculate the mAP score, first (**1.**) we calculate the Average Precision (AP) for each of the classes. Then (**2.**) we obtain the final mAP score by simply calculating the arithmetic mean of the AP values of all the classes.
+To calculate the mAP score, first (**1.**), we calculate the Average Precision (AP) for each of the classes. Then (**2.**), we obtain the final mAP score by merely calculating the arithmetic mean of the AP values of all the classes of objects.
 
 #### 1. Calculate AP
 
@@ -41,20 +38,20 @@ For each class (e.g. `person`, `car`):
 
 First, your **detection-results** are sorted by decreasing confidence values.
 
-TODO: Add example image of objects sorted by decreasing confidence score
+(TODO: Add example image of objects sorted by decreasing confidence score)
 
-Then, each of these detections (from higher to lower confidence) are assigned to the **ground-truth** objects. We have a true positive when they share the **same label** and a significant overlap **IoU >= 0.5** (Intersection over Union greater than 50%).
+Then, each of these detections (from higher to lower confidence) is assigned to a **ground-truth** object. We have a true positive when they share the **same label** and a significant overlap **IoU >= 0.5** (Intersection over Union greater than 50%).
 
-TODO: improve this image
+(TODO: improve this image)
 <img src="https://user-images.githubusercontent.com/15831541/37725175-45b9e1a6-2d2a-11e8-8c15-2fb4d716ca9a.png" width="35%" height="35%" />
 
-Note that we also want to avoid multiple detections of the same object. Hence, if a detection is assigned to a ground-truth object that was already used it will be evaluated as a false positive.
+Note that we also want to avoid multiple detections of the same object. Therefore, a repeated detection of a ground-truth object is a false positive.
 
-TODO: add example explaining
+(TODO: add example image to assist explanation)
 
-Using this criterium, we calculate the precision/recall curve. E.g:
+Using this criterion, we calculate the precision/recall curve. E.g.:
 
-TODO: improve this image
+(TODO: improve this image)
 <img src="https://user-images.githubusercontent.com/15831541/43008995-64dd53ce-8c34-11e8-8a2c-4567b1311910.png" width="45%" height="45%" />
 
 Then we compute a version of the measured precision/recall curve with **precision monotonically decreasing** (shown in light red), by setting the precision for recall `r` to the maximum precision obtained for any recall `r' > r`.
@@ -87,7 +84,7 @@ TODO: add a quick way to install everything and add tqdm and numpy
 
 ## Quick-start
 
-TODO: add a release version
+(TODO: add a release version)
 To start using the mAP you need to clone the repo:
 
 ```
