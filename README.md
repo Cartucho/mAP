@@ -100,21 +100,21 @@ Please select the object detector that you are using from one of the following o
   <summary><b>AlexeyAB/darknet</b></summary>
   <p><br>Step-by-step:</p>
   <ol>
-    <li>Edit the file <code>class.names</code> in the directory <code>mAP/input/</code> to your own set of classes (one per line)</li>
+    <li>Create a file <code>class.names</code> in the directory <code>mAP/input/</code> with your set of classes (one per line)</li>
     <li>Create the <code>ground-truth</code> files (explained below)</li>
     <li>Copy the <code>ground-truth</code> files (one per image) to the directory <code>mAP/input/ground-truth/</code></li>
     <li>Create the <code>results.txt</code> file (explained below)</li>
     <li>Copy the <code>resuts.txt</code> file to the directory <code>mAP/input/detection-results/</code></li>
-    <li>(optional) Copy the relevant images to the directory <code>mAP/input/images-optional/</code></li>
+    <li>(optional) Copy the images (corresponding to each ground-truth file) to the directory <code>mAP/input/images-optional/</code></li>
     <li>Run the code: <code>python main.py</code></li>
   </ol>
   <h5>2. Create the ground-truth files</h5>
-  <p>The AlexeyAB's training/test files are already in the YOLO format (one of the formats that we support). So you can just jump to step 3. Additionally, if you need to label a new set of pictures in the YOLO format you can use this tool in Python: <a href="https://github.com/Cartucho/OpenLabeling">OpenLabeling</a>.</p>
+  <p>The AlexeyAB's training/test files are in the YOLO format (a format that we support). So you can jump to step 3. If you need to label a new set of pictures in the YOLO format, you can use this tool in Python: <a href="https://github.com/Cartucho/OpenLabeling">OpenLabeling</a>.</p>
   <h5>4. Create the results.txt file</h5>
-  <p>As explained in the AlexeyAB repo's README you can run the detector on a set of images and save the detection-results to a single <code>result.txt</code> file. An example is shown below:</p>
+  <p>As explained in the <a href="https://github.com/AlexeyAB/darknet#how-to-use-on-the-command-line">AlexeyAB repo's README</a> you can run the detector on a set of images and save the detection-results to a single <code>result.txt</code> file. An example is shown below:</p>
   <pre>
     <code>
-    # Example: forward all images in data/train.txt using yolov3 coco and output to the file result.txt
+    # Example: process a list of images `data/train.txt` using yolov3 COCO and save the results in a file `result.txt`
     darknet.exe detector test cfg/coco.data yolov3.cfg yolov3.weights -dont_show -ext_output &lt; data/train.txt &gt; result.txt
     </code>
   </pre>
