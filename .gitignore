@@ -1,1 +1,3 @@
 results/
+*.pyc
+.temp_files/
