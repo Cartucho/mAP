@@ -50,16 +50,21 @@ We calculate the mean of all the AP's, resulting in an mAP value from 0 to 100%.
 
 ## Prerequisites
 
-You need to install:
-- [Python](https://www.python.org/downloads/)
 
-Optional:
-- **plot** the results by [installing Matplotlib](https://matplotlib.org/users/installing.html) - Linux, macOS and Windows:
-    1. `python -mpip install -U pip`  
-    2.  `python -mpip install -U matplotlib`
--  show **animation** by installing [OpenCV](https://www.opencv.org/):
-    1. `python -mpip install -U pip`
-    2. `python -mpip install -U opencv-python`  
+1. Install [pipenv](https://pipenv.readthedocs.io/en/latest/)
+2. Create a virtualenv using pipenv
+```bash
+cd ./mAP
+pipenv install 
+```  
+3. Activate your virtualenv
+```bash
+pipenv shell
+```
+4. Now you are ready to run main.py
+```bash
+python main.py
+```
 
 ## Quick-start
 To start using the mAP you need to clone the repo:
