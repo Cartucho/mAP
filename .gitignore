@@ -1,3 +1,4 @@
 results/
 .venv
 .idea
+.temp_files
