@@ -8,7 +8,7 @@ ipython = "*"
 pytest = "*"
 matplotlib = "*"
 opencv-python = "*"
-
+sklearn = "*"
 
 [requires]
 python_version = "3.6"

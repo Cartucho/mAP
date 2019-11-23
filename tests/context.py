@@ -13,3 +13,4 @@ from mAP.iou import *
 from mean_average_precision import MeanAveragePrecision
 from mAP.precision import Precision
 from mAP.recall import Recall
+from mAP.average_precision import *
