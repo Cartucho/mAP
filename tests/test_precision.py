@@ -28,3 +28,19 @@ def test_precision():
     print(detections)
     precision = Precision.compute(detections)
     print(precision)
+
+
+def test_precision_backpack():
+    true_positives = np.array([1, 0, 1, 1, 0])
+    false_positives = np.array([0, 1, 0, 0, 1])
+    precision = Precision.from_true_positives_and_false_positives(true_positives, false_positives)
+    print(precision)
+    assert precision.tolist() == [1.0, 0.5, 0.6666666666666666, 0.75, 0.6]
+
+
+def test_precision_bed():
+    true_positives = np.array([1, 1, 1, 1, 1, 1, 0, 1])
+    false_positives = np.array([0, 0, 0, 0, 0, 0, 1, 0])
+    precision = Precision.from_true_positives_and_false_positives(true_positives, false_positives)
+    print(precision)
+    assert precision.tolist() == [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.8571428571428571, 0.875]

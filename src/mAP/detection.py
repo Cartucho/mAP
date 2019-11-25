@@ -1,7 +1,7 @@
 class Detection:
-    def __init__(self, file_id, class_idx, confidence, bounding_box):
+    def __init__(self, file_id, class_id, confidence, bounding_box):
         self.file_id = file_id
-        self.class_idx = class_idx
+        self.class_id = class_id
         self.confidence = confidence
         self.bounding_box = bounding_box
 
@@ -11,4 +11,4 @@ class Detection:
         self.classification = classification
 
     def __repr__(self):
-        return f"Detection({self.file_id}, {self.class_idx}, {self.confidence}, {self.bounding_box}, {self.classification})"
+        return f"Detection({self.file_id}, {self.class_id}, {self.confidence}, {self.bounding_box}, {self.classification})"

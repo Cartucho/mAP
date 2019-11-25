@@ -13,9 +13,6 @@ class Precision:
         :param detections:
         :return:
         """
-        # this will ensure the list of detections is sorted
-        # list.sort is a stable sort - so it should not hurt when list is already sorted)
-        detections.sort(key=lambda d: d.confidence, reverse=True)
 
         true_positives = np.array([1 if detection.classification == Classification.TRUE_POSITIVE else 0
                                    for detection in detections])
@@ -23,6 +20,10 @@ class Precision:
         false_positives = np.array([1 if detection.classification == Classification.FALSE_POSITIVE else 0
                                     for detection in detections])
 
+        return Precision.from_true_positives_and_false_positives(true_positives, false_positives)
+
+    @staticmethod
+    def from_true_positives_and_false_positives(true_positives, false_positives):
         true_positives_cumulative = true_positives.cumsum()
         false_positives_cumulative = false_positives.cumsum()
 

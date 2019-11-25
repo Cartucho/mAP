@@ -28,3 +28,14 @@ def test_recall():
     print(detections)
     recall = Recall.compute(detections, 8)
     print(recall)
+
+
+def test_recall_backpack():
+    true_positives = np.array( [1, 0, 1, 1, 0])
+    recall = Recall.from_true_positives_and_total_number_ground_truth_objects_for_class(true_positives, 11)
+    assert recall.tolist() ==  [0.09090909090909091, 0.09090909090909091, 0.18181818181818182, 0.2727272727272727, 0.2727272727272727]
+
+def test_recall_bed():
+    true_positives = np.array([1, 1, 1, 1, 1, 1, 0, 1])
+    recall = Recall.from_true_positives_and_total_number_ground_truth_objects_for_class(true_positives, 8)
+    assert recall.tolist() == [0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.75, 0.875]
