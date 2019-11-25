@@ -13,6 +13,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/petersiemen/mAP",
     packages=setuptools.find_packages(),
+    package_dir = {'': 'src'},
     classifiers=[
         "Programming Language :: Python :: 3"
     ],
