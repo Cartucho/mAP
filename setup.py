@@ -12,8 +12,7 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/petersiemen/mAP",
-    packages=['mAP'],
-    package_dir={'mAP': 'src/mAP'},
+    packages=['src/mAP'],
     classifiers=[
         "Programming Language :: Python :: 3"
     ],
