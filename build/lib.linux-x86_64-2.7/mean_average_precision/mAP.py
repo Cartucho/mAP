@@ -1,8 +1,8 @@
 from collections import defaultdict
-from mAP.classify import Classify
-from mAP.precision import Precision
-from mAP.recall import Recall
-from mAP.average_precision import compute_average_precision
+from mean_average_precision.classify import Classify
+from mean_average_precision.precision import Precision
+from mean_average_precision.recall import Recall
+from mean_average_precision.average_precision import compute_average_precision
 import numpy as np
 
 

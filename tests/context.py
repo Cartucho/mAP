@@ -3,15 +3,15 @@
 import sys
 import os
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../mAP')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../mean_average_precision')))
 
-from mAP.bounding_box import *
-from mAP.detection import *
-from mAP.ground_truth import *
-from mAP.classify import *
-from mAP.iou import *
-from mAP.mean_average_precision import MeanAveragePrecision
-from mAP.precision import Precision
-from mAP.recall import Recall
-from mAP.average_precision import *
-from mAP.iou import *
+from mean_average_precision.bounding_box import *
+from mean_average_precision.detection import *
+from mean_average_precision.ground_truth import *
+from mean_average_precision.classify import *
+from mean_average_precision.iou import *
+from mean_average_precision.mAP import MeanAveragePrecision
+from mean_average_precision.precision import Precision
+from mean_average_precision.recall import Recall
+from mean_average_precision.average_precision import *
+from mean_average_precision.iou import *

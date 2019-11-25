@@ -1,4 +1,4 @@
-from mAP.classify import Classification
+from mean_average_precision.classify import Classification
 import numpy as np
 
 

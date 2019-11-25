@@ -1,5 +1,5 @@
 from enum import Enum
-from mAP.iou import iou
+from mean_average_precision.iou import iou
 import numpy as np
 
 

@@ -1,0 +1,17 @@
+README.md
+setup.py
+mean_average_precision/__init__.py
+mean_average_precision/average_precision.py
+mean_average_precision/bounding_box.py
+mean_average_precision/classify.py
+mean_average_precision/detection.py
+mean_average_precision/ground_truth.py
+mean_average_precision/iou.py
+mean_average_precision/mAP.py
+mean_average_precision/precision.py
+mean_average_precision/recall.py
+mean_average_precision.egg-info/PKG-INFO
+mean_average_precision.egg-info/SOURCES.txt
+mean_average_precision.egg-info/dependency_links.txt
+mean_average_precision.egg-info/requires.txt
+mean_average_precision.egg-info/top_level.txt
