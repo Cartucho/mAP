@@ -1,0 +1,17 @@
+README.md
+setup.py
+mAP/__init__.py
+mAP/average_precision.py
+mAP/bounding_box.py
+mAP/classify.py
+mAP/detection.py
+mAP/ground_truth.py
+mAP/iou.py
+mAP/mean_average_precision.py
+mAP/precision.py
+mAP/recall.py
+mAP.egg-info/PKG-INFO
+mAP.egg-info/SOURCES.txt
+mAP.egg-info/dependency_links.txt
+mAP.egg-info/requires.txt
+mAP.egg-info/top_level.txt

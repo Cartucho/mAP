@@ -12,8 +12,7 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/petersiemen/mAP",
-    packages=setuptools.find_packages('src'),  # include all packages under src
-    package_dir={'':'src'}, # add scr as root
+    packages=setuptools.find_packages(exclude=['tests', 'main.py']),  # include all packages under src
     classifiers=[
         "Programming Language :: Python :: 3"
     ],

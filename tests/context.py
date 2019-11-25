@@ -3,7 +3,7 @@
 import sys
 import os
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../src/mAP')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../mAP')))
 
 from mAP.bounding_box import *
 from mAP.detection import *
