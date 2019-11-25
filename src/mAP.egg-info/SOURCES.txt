@@ -1,10 +1,5 @@
 README.md
 setup.py
-mAP.egg-info/PKG-INFO
-mAP.egg-info/SOURCES.txt
-mAP.egg-info/dependency_links.txt
-mAP.egg-info/requires.txt
-mAP.egg-info/top_level.txt
 src/mAP/__init__.py
 src/mAP/average_precision.py
 src/mAP/bounding_box.py
@@ -15,3 +10,8 @@ src/mAP/iou.py
 src/mAP/mean_average_precision.py
 src/mAP/precision.py
 src/mAP/recall.py
+src/mAP.egg-info/PKG-INFO
+src/mAP.egg-info/SOURCES.txt
+src/mAP.egg-info/dependency_links.txt
+src/mAP.egg-info/requires.txt
+src/mAP.egg-info/top_level.txt
