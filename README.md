@@ -2,15 +2,15 @@
 
 [![GitHub stars](https://img.shields.io/github/stars/Cartucho/mAP.svg?style=social&label=Stars)](https://github.com/Cartucho/mAP)
 
-This python code will evaluate the performance of your **object detector**. All the documentation is in the `docs/` directory and online at (TODO: add link to Read the Docs).
+This code, in Python, will evaluate the performance of your **object detector**. All the documentation is in the `docs/` directory and online at (TODO: add link to Read the Docs).
 
 <p align="center">
   <img src="https://user-images.githubusercontent.com/15831541/37559643-6738bcc8-2a21-11e8-8a07-ed836f19c5d9.gif" width="450" height="300" />
 </p>
 
-The uniqueness of this tool is that it allows you to quick and easily visualize your results. This allows you to understand how good your object detector really is and when is it failing.
+The advantage of this tool over the alternative ones is that it allows you to visualize your results. This allows you to better understand how good your object detector really is and when it is failing.
 
-In practice, a higher mAP value indicates a better performance of your neural-network. However, the mAP score is not enough. Therefore, the **goal of this repo** is not only to calculate the mAP score but also other metrics like *ROC curve*, *confusion matrix*, *log average miss-rate* and others!
+In practice, a higher mAP value indicates a better performance of your neural-network. In this repo we do not only calculate the mAP score but also other metrics like *ROC curve*, *confusion matrix*, *log average miss-rate* and others!
 
 ## Latest Features
 
