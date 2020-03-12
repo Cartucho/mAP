@@ -250,7 +250,7 @@ def draw_plot_func(dictionary, n_classes, window_title, plot_title, x_label, out
          Special case to draw in:
             - green -> TP: True Positives (object detected and matches ground-truth)
             - red -> FP: False Positives (object detected but does not match ground-truth)
-            - orange -> FN: False Negatives (object not detected but present in the ground-truth)
+            - pink -> FN: False Negatives (object not detected but present in the ground-truth)
         """
         fp_sorted = []
         tp_sorted = []
@@ -361,6 +361,7 @@ ground_truth_files_list.sort()
 gt_counter_per_class = {}
 counter_images_per_class = {}
 
+gt_files = []
 for txt_file in ground_truth_files_list:
     #print(txt_file)
     file_id = txt_file.split(".txt", 1)[0]
@@ -395,28 +396,30 @@ for txt_file in ground_truth_files_list:
             continue
         bbox = left + " " + top + " " + right + " " +bottom
         if is_difficult:
-                bounding_boxes.append({"class_name":class_name, "bbox":bbox, "used":False, "difficult":True})
-                is_difficult = False
+            bounding_boxes.append({"class_name":class_name, "bbox":bbox, "used":False, "difficult":True})
+            is_difficult = False
         else:
-                bounding_boxes.append({"class_name":class_name, "bbox":bbox, "used":False})
-                # count that object
-                if class_name in gt_counter_per_class:
-                    gt_counter_per_class[class_name] += 1
+            bounding_boxes.append({"class_name":class_name, "bbox":bbox, "used":False})
+            # count that object
+            if class_name in gt_counter_per_class:
+                gt_counter_per_class[class_name] += 1
+            else:
+                # if class didn't exist yet
+                gt_counter_per_class[class_name] = 1
+
+            if class_name not in already_seen_classes:
+                if class_name in counter_images_per_class:
+                    counter_images_per_class[class_name] += 1
                 else:
                     # if class didn't exist yet
-                    gt_counter_per_class[class_name] = 1
-
-                if class_name not in already_seen_classes:
-                    if class_name in counter_images_per_class:
-                        counter_images_per_class[class_name] += 1
-                    else:
-                        # if class didn't exist yet
-                        counter_images_per_class[class_name] = 1
-                    already_seen_classes.append(class_name)
+                    counter_images_per_class[class_name] = 1
+                already_seen_classes.append(class_name)
 
 
     # dump bounding_boxes into a ".json" file
-    with open(TEMP_FILES_PATH + "/" + file_id + "_ground_truth.json", 'w') as outfile:
+    new_temp_file = TEMP_FILES_PATH + "/" + file_id + "_ground_truth.json"
+    gt_files.append(new_temp_file)
+    with open(new_temp_file, 'w') as outfile:
         json.dump(bounding_boxes, outfile)
 
 gt_classes = list(gt_counter_per_class.keys())
@@ -725,6 +728,25 @@ with open(output_files_path + "/output.txt", 'w') as output_file:
     text = "mAP = {0:.2f}%".format(mAP*100)
     output_file.write(text + "\n")
     print(text)
+
+"""
+ Draw false negatives
+"""
+pink = (203,192,255)
+for tmp_file in gt_files:
+    ground_truth_data = json.load(open(tmp_file))
+    #print(ground_truth_data)
+    # get name of corresponding image
+    start = TEMP_FILES_PATH + '/'
+    img_id = tmp_file[tmp_file.find(start)+len(start):tmp_file.rfind('_ground_truth.json')]
+    img_cumulative_path = output_files_path + "/images/" + img_id + ".jpg"
+    img = cv2.imread(img_cumulative_path)
+    # draw false negatives
+    for obj in ground_truth_data:
+        if not obj['used']:
+            bbgt = [ int(round(float(x))) for x in obj["bbox"].split() ]
+            cv2.rectangle(img,(bbgt[0],bbgt[1]),(bbgt[2],bbgt[3]),pink,2)
+    cv2.imwrite(img_cumulative_path, img)
 
 # remove the temp_files directory
 shutil.rmtree(TEMP_FILES_PATH)
