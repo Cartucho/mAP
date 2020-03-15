@@ -741,6 +741,9 @@ for tmp_file in gt_files:
     img_id = tmp_file[tmp_file.find(start)+len(start):tmp_file.rfind('_ground_truth.json')]
     img_cumulative_path = output_files_path + "/images/" + img_id + ".jpg"
     img = cv2.imread(img_cumulative_path)
+    if img is None:
+        img_path = IMG_PATH + '/' + img_id + ".jpg"
+        img = cv2.imread(img_path)
     # draw false negatives
     for obj in ground_truth_data:
         if not obj['used']:
