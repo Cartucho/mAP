@@ -15,7 +15,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-na', '--no-animation', help="no animation is shown.", action="store_true")
 parser.add_argument('-np', '--no-plot', help="no plot is shown.", action="store_true")
 parser.add_argument('-q', '--quiet', help="minimalistic console output.", action="store_true")
-# argparse receiving list of classes to be ignored
+# argparse receiving list of classes to be ignored (e.g., python main.py --ignore person book)
 parser.add_argument('-i', '--ignore', nargs='+', type=str, help="ignore a list of classes.")
 # argparse receiving list of classes with specific IoU (e.g., python main.py --set-class-iou person 0.7)
 parser.add_argument('--set-class-iou', nargs='+', type=str, help="set IoU for a specific class.")
@@ -250,7 +250,7 @@ def draw_plot_func(dictionary, n_classes, window_title, plot_title, x_label, out
          Special case to draw in:
             - green -> TP: True Positives (object detected and matches ground-truth)
             - red -> FP: False Positives (object detected but does not match ground-truth)
-            - orange -> FN: False Negatives (object not detected but present in the ground-truth)
+            - pink -> FN: False Negatives (object not detected but present in the ground-truth)
         """
         fp_sorted = []
         tp_sorted = []
@@ -331,21 +331,21 @@ def draw_plot_func(dictionary, n_classes, window_title, plot_title, x_label, out
     plt.close()
 
 """
- Create a ".temp_files/" and "results/" directory
+ Create a ".temp_files/" and "output/" directory
 """
 TEMP_FILES_PATH = ".temp_files"
 if not os.path.exists(TEMP_FILES_PATH): # if it doesn't exist already
     os.makedirs(TEMP_FILES_PATH)
-results_files_path = "results"
-if os.path.exists(results_files_path): # if it exist already
-    # reset the results directory
-    shutil.rmtree(results_files_path)
+output_files_path = "output"
+if os.path.exists(output_files_path): # if it exist already
+    # reset the output directory
+    shutil.rmtree(output_files_path)
 
-os.makedirs(results_files_path)
+os.makedirs(output_files_path)
 if draw_plot:
-    os.makedirs(os.path.join(results_files_path, "classes"))
+    os.makedirs(os.path.join(output_files_path, "classes"))
 if show_animation:
-    os.makedirs(os.path.join(results_files_path, "images", "detections_one_by_one"))
+    os.makedirs(os.path.join(output_files_path, "images", "detections_one_by_one"))
 
 """
  ground-truth
@@ -361,6 +361,7 @@ ground_truth_files_list.sort()
 gt_counter_per_class = {}
 counter_images_per_class = {}
 
+gt_files = []
 for txt_file in ground_truth_files_list:
     #print(txt_file)
     file_id = txt_file.split(".txt", 1)[0]
@@ -395,28 +396,30 @@ for txt_file in ground_truth_files_list:
             continue
         bbox = left + " " + top + " " + right + " " +bottom
         if is_difficult:
-                bounding_boxes.append({"class_name":class_name, "bbox":bbox, "used":False, "difficult":True})
-                is_difficult = False
+            bounding_boxes.append({"class_name":class_name, "bbox":bbox, "used":False, "difficult":True})
+            is_difficult = False
         else:
-                bounding_boxes.append({"class_name":class_name, "bbox":bbox, "used":False})
-                # count that object
-                if class_name in gt_counter_per_class:
-                    gt_counter_per_class[class_name] += 1
+            bounding_boxes.append({"class_name":class_name, "bbox":bbox, "used":False})
+            # count that object
+            if class_name in gt_counter_per_class:
+                gt_counter_per_class[class_name] += 1
+            else:
+                # if class didn't exist yet
+                gt_counter_per_class[class_name] = 1
+
+            if class_name not in already_seen_classes:
+                if class_name in counter_images_per_class:
+                    counter_images_per_class[class_name] += 1
                 else:
                     # if class didn't exist yet
-                    gt_counter_per_class[class_name] = 1
-
-                if class_name not in already_seen_classes:
-                    if class_name in counter_images_per_class:
-                        counter_images_per_class[class_name] += 1
-                    else:
-                        # if class didn't exist yet
-                        counter_images_per_class[class_name] = 1
-                    already_seen_classes.append(class_name)
+                    counter_images_per_class[class_name] = 1
+                already_seen_classes.append(class_name)
 
 
     # dump bounding_boxes into a ".json" file
-    with open(TEMP_FILES_PATH + "/" + file_id + "_ground_truth.json", 'w') as outfile:
+    new_temp_file = TEMP_FILES_PATH + "/" + file_id + "_ground_truth.json"
+    gt_files.append(new_temp_file)
+    with open(new_temp_file, 'w') as outfile:
         json.dump(bounding_boxes, outfile)
 
 gt_classes = list(gt_counter_per_class.keys())
@@ -496,9 +499,9 @@ for class_index, class_name in enumerate(gt_classes):
 sum_AP = 0.0
 ap_dictionary = {}
 lamr_dictionary = {}
-# open file to store the results
-with open(results_files_path + "/results.txt", 'w') as results_file:
-    results_file.write("# AP and precision/recall per class\n")
+# open file to store the output
+with open(output_files_path + "/output.txt", 'w') as output_file:
+    output_file.write("# AP and precision/recall per class\n")
     count_true_positives = {}
     for class_index, class_name in enumerate(gt_classes):
         count_true_positives[class_name] = 0
@@ -529,7 +532,7 @@ with open(results_files_path + "/results.txt", 'w') as results_file:
                     # Load image
                     img = cv2.imread(IMG_PATH + "/" + ground_truth_img[0])
                     # load image with draws of multiple detections
-                    img_cumulative_path = results_files_path + "/images/" + ground_truth_img[0]
+                    img_cumulative_path = output_files_path + "/images/" + ground_truth_img[0]
                     if os.path.isfile(img_cumulative_path):
                         img_cumulative = cv2.imread(img_cumulative_path)
                     else:
@@ -643,8 +646,8 @@ with open(results_files_path + "/results.txt", 'w') as results_file:
                 # show image
                 cv2.imshow("Animation", img)
                 cv2.waitKey(20) # show for 20 ms
-                # save image to results
-                output_img_path = results_files_path + "/images/detections_one_by_one/" + class_name + "_detection" + str(idx) + ".jpg"
+                # save image to output
+                output_img_path = output_files_path + "/images/detections_one_by_one/" + class_name + "_detection" + str(idx) + ".jpg"
                 cv2.imwrite(output_img_path, img)
                 # save the image with all the objects drawn to it
                 cv2.imwrite(img_cumulative_path, img_cumulative)
@@ -673,11 +676,11 @@ with open(results_files_path + "/results.txt", 'w') as results_file:
         sum_AP += ap
         text = "{0:.2f}%".format(ap*100) + " = " + class_name + " AP " #class_name + " AP = {0:.2f}%".format(ap*100)
         """
-         Write to results.txt
+         Write to output.txt
         """
         rounded_prec = [ '%.2f' % elem for elem in prec ]
         rounded_rec = [ '%.2f' % elem for elem in rec ]
-        results_file.write(text + "\n Precision: " + str(rounded_prec) + "\n Recall :" + str(rounded_rec) + "\n\n")
+        output_file.write(text + "\n Precision: " + str(rounded_prec) + "\n Recall :" + str(rounded_rec) + "\n\n")
         if not args.quiet:
             print(text)
         ap_dictionary[class_name] = ap
@@ -714,17 +717,39 @@ with open(results_files_path + "/results.txt", 'w') as results_file:
             # Alternative option -> normal display
             #plt.show()
             # save the plot
-            fig.savefig(results_files_path + "/classes/" + class_name + ".png")
+            fig.savefig(output_files_path + "/classes/" + class_name + ".png")
             plt.cla() # clear axes for next plot
 
     if show_animation:
         cv2.destroyAllWindows()
 
-    results_file.write("\n# mAP of all classes\n")
+    output_file.write("\n# mAP of all classes\n")
     mAP = sum_AP / n_classes
     text = "mAP = {0:.2f}%".format(mAP*100)
-    results_file.write(text + "\n")
+    output_file.write(text + "\n")
     print(text)
+
+"""
+ Draw false negatives
+"""
+pink = (203,192,255)
+for tmp_file in gt_files:
+    ground_truth_data = json.load(open(tmp_file))
+    #print(ground_truth_data)
+    # get name of corresponding image
+    start = TEMP_FILES_PATH + '/'
+    img_id = tmp_file[tmp_file.find(start)+len(start):tmp_file.rfind('_ground_truth.json')]
+    img_cumulative_path = output_files_path + "/images/" + img_id + ".jpg"
+    img = cv2.imread(img_cumulative_path)
+    if img is None:
+        img_path = IMG_PATH + '/' + img_id + ".jpg"
+        img = cv2.imread(img_path)
+    # draw false negatives
+    for obj in ground_truth_data:
+        if not obj['used']:
+            bbgt = [ int(round(float(x))) for x in obj["bbox"].split() ]
+            cv2.rectangle(img,(bbgt[0],bbgt[1]),(bbgt[2],bbgt[3]),pink,2)
+    cv2.imwrite(img_cumulative_path, img)
 
 # remove the temp_files directory
 shutil.rmtree(TEMP_FILES_PATH)
@@ -760,7 +785,7 @@ if draw_plot:
     plot_title = "ground-truth\n"
     plot_title += "(" + str(len(ground_truth_files_list)) + " files and " + str(n_classes) + " classes)"
     x_label = "Number of objects per class"
-    output_path = results_files_path + "/ground-truth-info.png"
+    output_path = output_files_path + "/ground-truth-info.png"
     to_show = False
     plot_color = 'forestgreen'
     draw_plot_func(
@@ -778,10 +803,10 @@ if draw_plot:
 """
  Write number of ground-truth objects per class to results.txt
 """
-with open(results_files_path + "/results.txt", 'a') as results_file:
-    results_file.write("\n# Number of ground-truth objects per class\n")
+with open(output_files_path + "/output.txt", 'a') as output_file:
+    output_file.write("\n# Number of ground-truth objects per class\n")
     for class_name in sorted(gt_counter_per_class):
-        results_file.write(class_name + ": " + str(gt_counter_per_class[class_name]) + "\n")
+        output_file.write(class_name + ": " + str(gt_counter_per_class[class_name]) + "\n")
 
 """
  Finish counting true positives
@@ -804,7 +829,7 @@ if draw_plot:
     plot_title += str(count_non_zero_values_in_dictionary) + " detected classes)"
     # end Plot title
     x_label = "Number of objects per class"
-    output_path = results_files_path + "/detection-results-info.png"
+    output_path = output_files_path + "/detection-results-info.png"
     to_show = False
     plot_color = 'forestgreen'
     true_p_bar = count_true_positives
@@ -821,16 +846,16 @@ if draw_plot:
         )
 
 """
- Write number of detected objects per class to results.txt
+ Write number of detected objects per class to output.txt
 """
-with open(results_files_path + "/results.txt", 'a') as results_file:
-    results_file.write("\n# Number of detected objects per class\n")
+with open(output_files_path + "/output.txt", 'a') as output_file:
+    output_file.write("\n# Number of detected objects per class\n")
     for class_name in sorted(dr_classes):
         n_det = det_counter_per_class[class_name]
         text = class_name + ": " + str(n_det)
         text += " (tp:" + str(count_true_positives[class_name]) + ""
         text += ", fp:" + str(n_det - count_true_positives[class_name]) + ")\n"
-        results_file.write(text)
+        output_file.write(text)
 
 """
  Draw log-average miss rate plot (Show lamr of all classes in decreasing order)
@@ -839,7 +864,7 @@ if draw_plot:
     window_title = "lamr"
     plot_title = "log-average miss rate"
     x_label = "log-average miss rate"
-    output_path = results_files_path + "/lamr.png"
+    output_path = output_files_path + "/lamr.png"
     to_show = False
     plot_color = 'royalblue'
     draw_plot_func(
@@ -861,7 +886,7 @@ if draw_plot:
     window_title = "mAP"
     plot_title = "mAP = {0:.2f}%".format(mAP*100)
     x_label = "Average Precision"
-    output_path = results_files_path + "/mAP.png"
+    output_path = output_files_path + "/mAP.png"
     to_show = True
     plot_color = 'royalblue'
     draw_plot_func(
