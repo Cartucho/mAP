@@ -124,7 +124,7 @@ In the [scripts/extra](https://github.com/Cartucho/mAP/tree/master/scripts/extra
     book 0.269833 433 260 506 336
     ```
 ## Authors:
-* **João Cartucho** - Please give me your feedback: to.cartucho@gmail.com
+* **João Cartucho**
 
     Feel free to contribute
 
