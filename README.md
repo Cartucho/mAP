@@ -10,6 +10,20 @@ This code will evaluate the performance of your neural net for object recognitio
 
 In practice, a **higher mAP** value indicates a **better performance** of your neural net, given your ground-truth and set of classes.
 
+## Citation
+
+This project was developed for the following paper, please consider citing it:
+
+```bibtex
+@INPROCEEDINGS{8594067,
+  author={J. {Cartucho} and R. {Ventura} and M. {Veloso}},
+  booktitle={2018 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS)}, 
+  title={Robust Object Recognition Through Symbiotic Deep Learning In Mobile Robots}, 
+  year={2018},
+  pages={2336-2341},
+}
+```
+
 ## Table of contents
 
 - [Explanation](#explanation)
