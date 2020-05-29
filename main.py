@@ -77,7 +77,7 @@ if not args.no_plot:
         args.no_plot = True
 
 
-def log_average_miss_rate(precision, fp_cumsum, num_images):
+def log_average_miss_rate(prec, rec, num_images):
     """
         log-average miss rate:
             Calculated by averaging miss rates at 9 evenly spaced FPPI points
@@ -95,14 +95,14 @@ def log_average_miss_rate(precision, fp_cumsum, num_images):
     """
 
     # if there were no detections of that class
-    if precision.size == 0:
+    if prec.size == 0:
         lamr = 0
         mr = 1
         fppi = 0
         return lamr, mr, fppi
 
-    fppi = fp_cumsum / float(num_images)
-    mr = (1 - precision)
+    fppi = (1 - prec)
+    mr = (1 - rec)
 
     fppi_tmp = np.insert(fppi, 0, -1.0)
     mr_tmp = np.insert(mr, 0, 1.0)
@@ -686,7 +686,7 @@ with open(output_files_path + "/output.txt", 'w') as output_file:
         ap_dictionary[class_name] = ap
 
         n_images = counter_images_per_class[class_name]
-        lamr, mr, fppi = log_average_miss_rate(np.array(rec), np.array(fp), n_images)
+        lamr, mr, fppi = log_average_miss_rate(np.array(prec), np.array(rec), n_images)
         lamr_dictionary[class_name] = lamr
 
         """
