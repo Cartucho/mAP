@@ -555,11 +555,11 @@ with open(output_files_path + "/output.txt", 'w') as output_file:
                     bbgt = [ float(x) for x in obj["bbox"].split() ]
                     bi = [max(bb[0],bbgt[0]), max(bb[1],bbgt[1]), min(bb[2],bbgt[2]), min(bb[3],bbgt[3])]
                     iw = bi[2] - bi[0] + 1
-                    ih = bi[3] - bi[1] + 1
+                    ih = bi[1] - bi[3] + 1
                     if iw > 0 and ih > 0:
                         # compute overlap (IoU) = area of intersection / area of union
-                        ua = (bb[2] - bb[0] + 1) * (bb[3] - bb[1] + 1) + (bbgt[2] - bbgt[0]
-                                        + 1) * (bbgt[3] - bbgt[1] + 1) - iw * ih
+                        ua = (bb[2] - bb[0] + 1) * (bb[1] - bb[3] + 1) + (bbgt[2] - bbgt[0]
+                                        + 1) * (bbgt[1] - bbgt[3] + 1) - iw * ih
                         ov = iw * ih / ua
                         if ov > ovmax:
                             ovmax = ov
