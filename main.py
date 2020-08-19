@@ -9,7 +9,7 @@ import math
 
 import numpy as np
 
-MINOVERLAP = 0.5 # default value (defined in the PASCAL VOC2012 challenge)
+DEFAULT_IOU_PASCAL_VOC2012 = 0.5 # default value (defined in the PASCAL VOC2012 challenge)
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-na', '--no-animation', help="no animation is shown.", action="store_true")
@@ -19,6 +19,7 @@ parser.add_argument('-q', '--quiet', help="minimalistic console output.", action
 parser.add_argument('-i', '--ignore', nargs='+', type=str, help="ignore a list of classes.")
 # argparse receiving list of classes with specific IoU (e.g., python main.py --set-class-iou person 0.7)
 parser.add_argument('--set-class-iou', nargs='+', type=str, help="set IoU for a specific class.")
+parser.add_argument('--set-default-iou', type=float, help="set global IoU. Default is 0.5 as defined in PASCAL VOC2012 challenge")
 args = parser.parse_args()
 
 '''
@@ -40,6 +41,11 @@ if args.ignore is None:
 specific_iou_flagged = False
 if args.set_class_iou is not None:
     specific_iou_flagged = True
+
+if args.set_default_iou is not None:
+    MINOVERLAP = float(args.set_default_iou)
+else:
+    MINOVERLAP = DEFAULT_IOU_PASCAL_VOC2012
 
 # make sure that the cwd() is the location of the python script (so that every path makes sense)
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
