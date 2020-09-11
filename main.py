@@ -385,11 +385,11 @@ for txt_file in ground_truth_files_list:
             else:
                     class_name, left, top, right, bottom = line.split()
         except ValueError:
+            line_length = len(line.split)
             error_msg = "Error: File " + txt_file + " in the wrong format.\n"
-            error_msg += " Expected: <class_name> <left> <top> <right> <bottom> ['difficult']\n"
-            error_msg += " Received: " + line
+            error_msg += " Expected: <class_name> <left> <top> <right> <bottom> ['difficult']\n, of length 5"
+            error_msg += " Received: " + line + "of length " + line_length
             error_msg += "\n\nIf you have a <class_name> with spaces between words you should remove them\n"
-            error_msg += "by running the script \"remove_space.py\" or \"rename_class.py\" in the \"extra/\" folder."
             error(error_msg)
         # check if class is in the ignore list, if yes skip
         if class_name in args.ignore:
