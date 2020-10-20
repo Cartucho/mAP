@@ -9,7 +9,9 @@ import math
 
 import numpy as np
 
-MINOVERLAP = 0.5 # default value (defined in the PASCAL VOC2012 challenge)
+DEFAULT_IOU_PASCAL_VOC2012 = 0.5 # default value (defined in the PASCAL VOC2012 challenge)
+DEFAULT_GT_DIR=os.path.join(os.getcwd(), 'input', 'ground-truth')
+DEFAULT_DR_DIR=os.path.join(os.getcwd(), 'input', 'detection-results')
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-na', '--no-animation', help="no animation is shown.", action="store_true")
@@ -19,6 +21,9 @@ parser.add_argument('-q', '--quiet', help="minimalistic console output.", action
 parser.add_argument('-i', '--ignore', nargs='+', type=str, help="ignore a list of classes.")
 # argparse receiving list of classes with specific IoU (e.g., python main.py --set-class-iou person 0.7)
 parser.add_argument('--set-class-iou', nargs='+', type=str, help="set IoU for a specific class.")
+parser.add_argument('--set-default-iou', type=float, help="set global IoU. Default is 0.5 as defined in PASCAL VOC2012 challenge")
+parser.add_argument('--ground-truth', default=DEFAULT_GT_DIR, type=str, help="folder with ground truth *.txt files")
+parser.add_argument('--detection-results', default=DEFAULT_DR_DIR, type=str, help="folder with predicted *.txt files")
 args = parser.parse_args()
 
 '''
@@ -41,11 +46,16 @@ specific_iou_flagged = False
 if args.set_class_iou is not None:
     specific_iou_flagged = True
 
+if args.set_default_iou is not None:
+    MINOVERLAP = float(args.set_default_iou)
+else:
+    MINOVERLAP = DEFAULT_IOU_PASCAL_VOC2012
+
 # make sure that the cwd() is the location of the python script (so that every path makes sense)
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
-GT_PATH = os.path.join(os.getcwd(), 'input', 'ground-truth')
-DR_PATH = os.path.join(os.getcwd(), 'input', 'detection-results')
+GT_PATH = args.ground_truth
+DR_PATH = args.detection_results
 # if there are no images then no animation can be shown
 IMG_PATH = os.path.join(os.getcwd(), 'input', 'images-optional')
 if os.path.exists(IMG_PATH): 
