@@ -30,7 +30,7 @@ args = parser.parse_args()
             |         |
      y      |_________|
   (height)            *
-                (Right,Bottom)
+                (Right,Buttom)
 '''
 
 # if there are no classes to ignore then replace None by empty list
