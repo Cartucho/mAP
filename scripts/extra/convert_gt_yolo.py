@@ -55,11 +55,11 @@ for tmp_file in txt_list:
   image_name = tmp_file.split(".txt",1)[0]
   #print(image_name)
   ## check if image exists
-  for fname in os.listdir('../images'):
+  for fname in os.listdir('../images-optional'):
     if fname.startswith(image_name):
       ## image found
       #print(fname)
-      img = cv2.imread('../images/' + fname)
+      img = cv2.imread('../images-optional/' + fname)
       ## get image width and height
       img_height, img_width = img.shape[:2]
       break
