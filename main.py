@@ -547,6 +547,7 @@ with open(output_files_path + "/output.txt", 'w') as output_file:
             ground_truth_data = json.load(open(gt_file))
             ovmax = -1
             gt_match = -1
+            epsilon = 1e-6
             # load detected object bounding-box
             bb = [ float(x) for x in detection["bbox"].split() ]
             for obj in ground_truth_data:
@@ -554,12 +555,12 @@ with open(output_files_path + "/output.txt", 'w') as output_file:
                 if obj["class_name"] == class_name:
                     bbgt = [ float(x) for x in obj["bbox"].split() ]
                     bi = [max(bb[0],bbgt[0]), max(bb[1],bbgt[1]), min(bb[2],bbgt[2]), min(bb[3],bbgt[3])]
-                    iw = bi[2] - bi[0] + 1
-                    ih = bi[3] - bi[1] + 1
+                    iw = bi[2] - bi[0] + epsilon
+                    ih = bi[3] - bi[1] + epsilon
                     if iw > 0 and ih > 0:
                         # compute overlap (IoU) = area of intersection / area of union
-                        ua = (bb[2] - bb[0] + 1) * (bb[3] - bb[1] + 1) + (bbgt[2] - bbgt[0]
-                                        + 1) * (bbgt[3] - bbgt[1] + 1) - iw * ih
+                        ua = (bb[2] - bb[0] + epsilon) * (bb[3] - bb[1] + epsilon) + (bbgt[2] - bbgt[0]
+                                        + epsilon) * (bbgt[3] - bbgt[1] + epsilon) - iw * ih
                         ov = iw * ih / ua
                         if ov > ovmax:
                             ovmax = ov
